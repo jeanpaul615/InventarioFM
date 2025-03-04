@@ -31,7 +31,11 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
 
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+      <Button
+        variant="contained"
+        sx={{ backgroundColor: 'green', '&:hover': { backgroundColor: 'darkgreen' } }}
+        onClick={() => setOpen(true)}
+      >
         Add Product
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)}>

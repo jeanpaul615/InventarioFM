@@ -9,6 +9,7 @@ import {
 import { Search } from '@mui/icons-material';
 import AddProduct from './AddProduct';
 import UpdateProduct from './UpdateProduct';
+import Image from 'next/image';
 
 interface Product {
   id: number;
@@ -66,7 +67,12 @@ const ProductTable: React.FC = () => {
 
   return (
     <div className="mx-auto p-4 min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold text-amber-400 mb-6 text-center pt-28">INVENTARIO FERREMOLINA</h1>
+      <div className="flex items-center justify-center mb-6 pt-28">
+        <Image src="/logo.webp" alt="Logo" width={200} height={50} />
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 ml-3 drop-shadow-lg">
+          INVENTARIO FERREMOLINA
+        </h1>
+      </div>
       <Toolbar className="flex justify-between mb-4">
         <TextField
           variant="outlined"
@@ -87,8 +93,8 @@ const ProductTable: React.FC = () => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Nombre</TableCell>
+              <TableCell sx={{ backgroundColor: 'lightgray', fontWeight: 'bold' }}>ID</TableCell>
+              <TableCellsx={{ backgroundColor: 'lightgray', fontWeight: 'bold' }}>Nombre</TableCell>
               <TableCell>Valor Comercial</TableCell>
               <TableCell>Valor Unitario</TableCell>
               <TableCell>Lista 1</TableCell>
@@ -114,7 +120,7 @@ const ProductTable: React.FC = () => {
                     <UpdateProduct product={product} onUpdate={fetchProducts} />
                     <Button
                       variant="contained"
-                      color="secondary"
+                      color="error"
                       onClick={() => handleDelete(product.id)}
                     >
                       Delete
