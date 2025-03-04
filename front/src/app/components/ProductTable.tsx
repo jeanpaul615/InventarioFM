@@ -65,7 +65,7 @@ const ProductTable: React.FC = () => {
   const paginatedProducts = filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <div className="container mx-auto p-4 min-h-screen bg-gray-100">
+    <div className="mx-auto p-4 min-h-screen bg-gray-100">
       <h1 className="text-3xl font-bold text-amber-400 mb-6 text-center pt-28">INVENTARIO FERREMOLINA</h1>
       <Toolbar className="flex justify-between mb-4">
         <TextField
