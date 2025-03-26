@@ -14,9 +14,11 @@
     "@mui/icons-material": "^6.4.6",
     "@mui/material": "^6.4.6",
     "axios": "^1.8.1",
+    "file-saver": "^2.0.5",
     "next": "15.2.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
