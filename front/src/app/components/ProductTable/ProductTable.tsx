@@ -9,10 +9,12 @@ import SnackbarNotification from './SnackbarNotification';
 import AddProduct from '../AddProduct';
 import * as XLSX from 'xlsx';
 import Image from 'next/image';
+import { useApi } from '../../context/ApiContext';
 
 import { Product } from './ProductTableContent';
 
 const ProductTable: React.FC = () => {
+  const { baseUrl } = useApi(); // Obtener la URL base desde el contexto
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -23,7 +25,7 @@ const ProductTable: React.FC = () => {
   }, []);
 
   const fetchProducts = async () => {
-    const response = await axios.get('http://localhost:8000/products');
+    const response = await axios.get(`${baseUrl}/products`);
     setProducts(response.data);
   };
 
@@ -32,7 +34,7 @@ const ProductTable: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    await axios.delete(`http://localhost:8000/products/${id}`);
+    await axios.delete(`${baseUrl}/products/${id}`);
     fetchProducts();
     setSnackbarMessage('Product deleted successfully');
     setSnackbarOpen(true);
@@ -50,7 +52,7 @@ const ProductTable: React.FC = () => {
       const sheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-      await axios.post('http://localhost:8000/products/bulk', jsonData);
+      await axios.post(`${baseUrl}/products/bulk`, jsonData);
       fetchProducts();
       setSnackbarMessage('Productos cargados exitosamente');
       setSnackbarOpen(true);
@@ -64,7 +66,7 @@ const ProductTable: React.FC = () => {
 
   return (
     <React.Fragment>
-      <div className="flex items-center justify-center p-5">
+      <div className="bg-amber-50 flex items-center justify-center p-5">
         <Image src="/logo.webp" alt="Logo" width={200} height={50} />
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 ml-3 drop-shadow-lg">
           INVENTARIO FERREMOLINA

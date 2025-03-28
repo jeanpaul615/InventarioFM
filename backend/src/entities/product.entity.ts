@@ -8,19 +8,19 @@ export class Product {
   @Column()
   nombre: string;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2 })
   valor_comercial: number;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2 })
   valor_unitario: number;
 
-  @Column('int', { nullable: true })
+  @Column('decimal', { precision: 10, scale: 2 })
   lista_1: number;
 
-  @Column('int', { nullable: true })
+  @Column('decimal', { precision: 10, scale: 2 })
   lista_2: number;
 
-  @Column('int', { nullable: true })
+  @Column('decimal', { precision: 10, scale: 2 })
   lista_3: number;
 
   @Column('int')

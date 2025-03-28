@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Req,
+  HttpException,
+  HttpStatus,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from '../services/product.service';
 import { Product } from '../entities/product.entity';
 
@@ -29,5 +43,16 @@ export class ProductController {
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.productService.remove(id);
+  }
+  
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<{ message: string }> {
+    if (!file) {
+      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    }
+
+    // Procesar el archivo aquí
+    return { message: `Archivo procesado exitosamente. Nombre del archivo: ${file.originalname}` };
   }
 }

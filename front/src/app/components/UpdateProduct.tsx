@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import axios from 'axios';
+import { useApi } from '../context/ApiContext';
 
 interface UpdateProductProps {
   product: {
@@ -17,6 +18,7 @@ interface UpdateProductProps {
 }
 
 const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
+  const { baseUrl } = useApi(); // Obtener la URL base desde el contexto
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(product);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -41,7 +43,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
 
   const handleSubmit = async () => {
     if (validate()) {
-      await axios.put(`http://localhost:8000/products/${form.id}`, form);
+      await axios.put(`${baseUrl}/products/${form.id}`, form);
       setOpen(false);
       onUpdate();
     }
