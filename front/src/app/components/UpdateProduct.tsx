@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Box,
+  Typography,
+  IconButton,
+} from '@mui/material';
+import { Close } from '@mui/icons-material';
 import axios from 'axios';
 import { useApi } from '../context/ApiContext';
 
@@ -30,42 +42,71 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
 
   const validate = () => {
     let tempErrors: { [key: string]: string } = {};
-    if (!form.nombre) tempErrors.nombre = "Nombre es requerido";
-    if (form.valor_comercial <= 0) tempErrors.valor_comercial = "Valor Comercial debe ser mayor que 0";
-    if (form.valor_unitario <= 0) tempErrors.valor_unitario = "Valor Unitario debe ser mayor que 0";
-    if (form.lista_1 < 0) tempErrors.lista_1 = "Lista 1 no puede ser negativo";
-    if (form.lista_2 < 0) tempErrors.lista_2 = "Lista 2 no puede ser negativo";
-    if (form.lista_3 < 0) tempErrors.lista_3 = "Lista 3 no puede ser negativo";
-    if (form.cantidad < 0) tempErrors.cantidad = "Cantidad no puede ser negativo";
+    if (!form.nombre) tempErrors.nombre = 'El nombre es obligatorio.';
+    if (form.valor_comercial <= 0) tempErrors.valor_comercial = 'Debe ser mayor a 0.';
+    if (form.valor_unitario <= 0) tempErrors.valor_unitario = 'Debe ser mayor a 0.';
+    if (form.lista_1 < 0) tempErrors.lista_1 = 'No puede ser negativo.';
+    if (form.lista_2 < 0) tempErrors.lista_2 = 'No puede ser negativo.';
+    if (form.lista_3 < 0) tempErrors.lista_3 = 'No puede ser negativo.';
+    if (form.cantidad < 0) tempErrors.cantidad = 'No puede ser negativo.';
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (validate()) {
-      await axios.put(`${baseUrl}/products/${form.id}`, form);
-      setOpen(false);
-      onUpdate();
+      try {
+        await axios.put(`${baseUrl}/products/${form.id}`, form);
+        setOpen(false);
+        onUpdate();
+      } catch (error) {
+        console.error('Error al actualizar el producto:', error);
+      }
     }
   };
 
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
-        Update
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '009bda',
+          '&:hover': { backgroundColor: '#c0edff', boxShadow: 'none', borderColor: '#c0edff', color: '#009bda' },
+          fontWeight: 'bold',
+        }}
+        onClick={() => setOpen(true)}
+      >
+        Editar Producto
       </Button>
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Update Product</DialogTitle>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+          },
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" fontWeight="bold">
+              Editar Producto
+            </Typography>
+            <IconButton onClick={() => setOpen(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
         <DialogContent>
-          <Box component="form" noValidate autoComplete="off">
+          <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  autoFocus
-                  margin="dense"
                   name="nombre"
                   label="Nombre"
-                  type="text"
                   fullWidth
                   value={form.nombre}
                   onChange={handleChange}
@@ -75,7 +116,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  margin="dense"
                   name="valor_comercial"
                   label="Valor Comercial"
                   type="number"
@@ -88,7 +128,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  margin="dense"
                   name="valor_unitario"
                   label="Valor Unitario"
                   type="number"
@@ -101,7 +140,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  margin="dense"
                   name="lista_1"
                   label="Lista 1"
                   type="number"
@@ -114,7 +152,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  margin="dense"
                   name="lista_2"
                   label="Lista 2"
                   type="number"
@@ -127,7 +164,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  margin="dense"
                   name="lista_3"
                   label="Lista 3"
                   type="number"
@@ -140,7 +176,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  margin="dense"
                   name="cantidad"
                   label="Cantidad"
                   type="number"
@@ -155,11 +190,24 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)} color="secondary">
-            Cancel
+          <Button
+            onClick={() => setOpen(false)}
+            sx={{
+              color: '#f44336',
+              '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' },
+            }}
+          >
+            Cancelar
           </Button>
-          <Button onClick={handleSubmit} color="primary">
-            Update
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            sx={{
+              backgroundColor: '#4caf50',
+              '&:hover': { backgroundColor: '#388e3c' },
+            }}
+          >
+            Guardar Cambios
           </Button>
         </DialogActions>
       </Dialog>

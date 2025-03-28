@@ -96,7 +96,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
         }}
       >
         <DialogTitle>
-          <Typography variant="h6" fontWeight="bold" textAlign="center">
+          <Typography fontWeight="bold" textAlign="center">
             Agregar Nuevo Producto
           </Typography>
         </DialogTitle>

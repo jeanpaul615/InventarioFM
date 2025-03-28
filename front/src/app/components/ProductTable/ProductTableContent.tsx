@@ -94,7 +94,11 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({ products, onD
                 <TableCell>
                   <div className="flex space-x-2">
                     <UpdateProduct product={product} onUpdate={onUpdate} />
-                    <Button variant="contained" color="error" onClick={() => onDelete(product.id)}>
+                    <Button sx={{
+                      backgroundColor: '#da0007',
+                      '&:hover': { backgroundColor: '#ffa8aa', boxShadow: 'none', borderColor: '#c0edff', color: '#da0007' },
+                      fontWeight: 'bold',
+                    }} variant="contained" color="error" onClick={() => onDelete(product.id)}>
                       Delete
                     </Button>
                   </div>

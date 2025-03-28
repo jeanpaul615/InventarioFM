@@ -83,8 +83,10 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
         startIcon={<Upload />}
         onClick={() => setOpen(true)}
         sx={{fontWeight: 'bold',
-          backgroundColor: '#050371',
-          '&:hover': { backgroundColor: '#161621' },
+          backgroundColor: '#f9f4f4',
+          borderColor: '#050371',
+          color: '#8c7c0b',
+          '&:hover': { backgroundColor: '#161621', boxShadow: 'none', borderColor: '#161621', color: '#f9f4f4'},
         }}
       >
         Cargar Archivo
