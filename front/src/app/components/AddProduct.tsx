@@ -65,8 +65,20 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
         lista_3: 0,
         cantidad: 0,
       });
-    } catch (error) {
-      console.error('Error al agregar el producto:', error);
+    } catch (error: any) {
+      if (error.response) {
+        // El servidor respondió con un código de estado fuera del rango 2xx
+        console.error('Error en la respuesta del servidor:', error.response.data);
+        alert(`Error del servidor: ${error.response.data.message || 'Error desconocido'}`);
+      } else if (error.request) {
+        // La solicitud fue hecha pero no se recibió respuesta
+        console.error('Error de red:', error.request);
+        alert('No se pudo conectar con el servidor. Verifica tu conexión.');
+      } else {
+        // Algo pasó al configurar la solicitud
+        console.error('Error:', error.message);
+        alert(`Error al agregar el producto: ${error.message}`);
+      }
     }
   };
 

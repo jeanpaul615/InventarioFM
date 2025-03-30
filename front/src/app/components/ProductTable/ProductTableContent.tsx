@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from 'react';
-import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button,
-} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import UpdateProduct from '../UpdateProduct';
 import Paginator from './Paginator'; // Import the Paginator component
 import ItemsPerPageSelector from './ItemsPerPageSelector'; // Import the ItemsPerPageSelector component
@@ -22,6 +21,8 @@ interface ProductTableContentProps {
   products: Product[];
   onDelete: (id: number) => void;
   onUpdate: () => void;
+  onSortById: () => void; // Nueva función para manejar la ordenación
+  sortOrder: 'asc' | 'desc'; // Estado del orden actual
 }
 
 // Reusable header cell component
@@ -39,7 +40,13 @@ const HeaderCell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </TableCell>
 );
 
-const ProductTableContent: React.FC<ProductTableContentProps> = ({ products, onDelete, onUpdate }) => {
+const ProductTableContent: React.FC<ProductTableContentProps> = ({
+  products,
+  onDelete,
+  onUpdate,
+  onSortById,
+  sortOrder,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // State for items per page
 
@@ -59,14 +66,26 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({ products, onD
 
   return (
     <div className="bg-amber-50 flex flex-col space-y-4"> {/* Adjust container to reduce spacing */}
-      <TableContainer component={Paper}   sx={{
-    backgroundColor: '#FFFBEB', // Código hexadecimal para bg-amber-50
-    minHeight: '100vh', // Asegura que el fondo cubra toda la pantalla
-  }} className="bg-amber-50 shadow-lg">
+      <TableContainer component={Paper} sx={{
+        backgroundColor: '#FFFBEB', // Código hexadecimal para bg-amber-50
+        minHeight: '100vh', // Asegura que el fondo cubra toda la pantalla
+      }} className="bg-amber-50 shadow-lg">
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <HeaderCell>ID</HeaderCell>
+              <TableCell
+                onClick={onSortById}
+                sx={{
+                  background: 'linear-gradient(to right, #beb7b7, #5b5757)',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  padding: '16px',
+                  borderRight: '1px solid #e0e0e0',
+                  cursor: 'pointer',
+                }}
+              >
+                ID {sortOrder === 'asc' ? '↑' : '↓'}
+              </TableCell>
               <HeaderCell>Nombre</HeaderCell>
               <HeaderCell>Valor Comercial</HeaderCell>
               <HeaderCell>Valor Unitario</HeaderCell>

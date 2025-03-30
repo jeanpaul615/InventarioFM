@@ -19,6 +19,7 @@ const ProductTable: React.FC = () => {
   const [search, setSearch] = useState('');
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Estado para el orden de clasificación
 
   useEffect(() => {
     fetchProducts();
@@ -36,7 +37,7 @@ const ProductTable: React.FC = () => {
   const handleDelete = async (id: number) => {
     await axios.delete(`${baseUrl}/products/${id}`);
     fetchProducts();
-    setSnackbarMessage('Product deleted successfully');
+    setSnackbarMessage('Producto eliminado exitosamente');
     setSnackbarOpen(true);
   };
 
@@ -60,6 +61,18 @@ const ProductTable: React.FC = () => {
     reader.readAsBinaryString(file);
   };
 
+  const handleSortById = () => {
+    const sortedProducts = [...products].sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a.id - b.id; // Orden ascendente
+      } else {
+        return b.id - a.id; // Orden descendente
+      }
+    });
+    setProducts(sortedProducts);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); // Alternar el orden
+  };
+
   const filteredProducts = products.filter((product) =>
     product.nombre.toLowerCase().includes(search.toLowerCase())
   );
@@ -79,7 +92,13 @@ const ProductTable: React.FC = () => {
           <AddProduct onAdd={fetchProducts} />
         </div>
       </Toolbar>
-      <ProductTableContent products={filteredProducts} onDelete={handleDelete} onUpdate={fetchProducts} />
+      <ProductTableContent
+        products={filteredProducts}
+        onDelete={handleDelete}
+        onUpdate={fetchProducts}
+        onSortById={handleSortById} // Pasar la función de ordenación
+        sortOrder={sortOrder} // Pasar el estado del orden actual
+      />
       <SnackbarNotification open={snackbarOpen} message={snackbarMessage} onClose={() => setSnackbarOpen(false)} />
     </React.Fragment>
   );
