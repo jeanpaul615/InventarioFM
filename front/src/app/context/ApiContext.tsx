@@ -9,7 +9,7 @@ const ApiContext = createContext<ApiContextProps | undefined>(undefined);
 
 export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const apiConfig = {
-    baseUrl: 'http://localhost:8005',
+    baseUrl: 'http://localhost:8000',
   };
 
   return <ApiContext.Provider value={apiConfig}>{children}</ApiContext.Provider>;
