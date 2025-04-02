@@ -20,23 +20,16 @@ import InfoIcon from '@mui/icons-material/Info';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import LoginIcon from '@mui/icons-material/Login';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import LayersIcon from '@mui/icons-material/Layers';
-import { useRouter } from 'next/navigation';
+
+import { useRouter } from 'next/navigation'
 import { styled } from '@mui/system';
 
 const NAVIGATION = [
-  { title: 'Home', icon: <HomeIcon />, path: '/' },
-  { title: 'About', icon: <InfoIcon />, path: '/about' },
+  { title: 'Inventario', icon: <HomeIcon />, path: '/' },
+  { title: 'Facturacion', icon: <InfoIcon />, path: '/billing' },
   { title: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
   { title: 'Login', icon: <LoginIcon />, path: '/login' },
   { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { title: 'Orders', icon: <ShoppingCartIcon />, path: '/orders' },
-  { title: 'Sales Reports', icon: <BarChartIcon />, path: '/reports/sales' },
-  { title: 'Traffic Reports', icon: <DescriptionIcon />, path: '/reports/traffic' },
-  { title: 'Integrations', icon: <LayersIcon />, path: '/integrations' },
 ];
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({

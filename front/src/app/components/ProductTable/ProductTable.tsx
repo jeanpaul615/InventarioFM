@@ -10,7 +10,6 @@ import AddProduct from '../AddProduct';
 import * as XLSX from 'xlsx';
 import Image from 'next/image';
 import { useApi } from '../../context/ApiContext';
-
 import { Product } from './ProductTableContent';
 
 const ProductTable: React.FC = () => {
