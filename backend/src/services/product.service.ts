@@ -40,18 +40,24 @@ export class ProductService {
   }
 
   async bulkCreate(products: any[]): Promise<void> {
-    const productEntities = products.map((row) => {
-      const product = new Product();
-      product.nombre = row.nombre;
-      product.valor_comercial = row.valor_comercial;
-      product.valor_unitario = row.valor_unitario;
-      product.lista_1 = row.lista_1;
-      product.lista_2 = row.lista_2;
-      product.lista_3 = row.lista_3;
-      product.cantidad = row.cantidad;
-      return product;
-    });
+    try {
+      const productEntities = products.map((row) => {
+        const product = new Product();
+        product.nombre = row.nombre;
+        product.valor_comercial = row.valor_comercial;
+        product.valor_unitario = row.valor_unitario;
+        product.lista_1 = row.lista_1;
+        product.lista_2 = row.lista_2;
+        product.lista_3 = row.lista_3;
+        product.cantidad = row.cantidad;
+        return product;
+      });
 
-    await this.productRepository.save(productEntities);
+      await this.productRepository.save(productEntities);
+      console.log('Productos guardados:', productEntities.length);
+    } catch (error) {
+      console.error('Error al guardar productos:', error);
+      throw error;
+    }
   }
 }

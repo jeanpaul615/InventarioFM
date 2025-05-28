@@ -35,7 +35,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
 
     setLoading(true);
     const formData = new FormData();
-    formData.append('file', file); // Agregar el archivo al FormData
+    formData.append('file', file);
 
     try {
       const response = await fetch(`${baseUrl}/products/upload`, {
@@ -43,35 +43,62 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al cargar el archivo.');
-      }
-
-      // Verificar si la respuesta es JSON
+      // Procesar respuesta del backend
       const contentType = response.headers.get('content-type');
+      let resultMessage = '';
       if (contentType && contentType.includes('application/json')) {
         const result = await response.json();
-        console.log('Respuesta del servidor:', result);
-        alert(result.message || 'Archivo cargado exitosamente.');
+        resultMessage = result.message || 'Archivo cargado exitosamente.';
+        if (response.ok) {
+          Swal.fire({
+            title: 'Operación Completada',
+            text: resultMessage,
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#4caf50',
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: resultMessage,
+            icon: 'error',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#d32f2f',
+          });
+        }
       } else {
         const text = await response.text();
-        console.log('Respuesta del servidor (texto):', text);
-        Swal.fire({
-          title: 'Operación Completada',
-          text: text || 'El archivo se ha cargado exitosamente.',
-          icon: 'success',
-          confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#4caf50',
-        });
+        if (response.ok) {
+          Swal.fire({
+            title: 'Operación Completada',
+            text: text || 'El archivo se ha cargado exitosamente.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#4caf50',
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: text || 'Error al cargar el archivo.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#d32f2f',
+          });
+        }
       }
     } catch (error: any) {
       console.error('Error:', error.message);
-      alert(`Hubo un error al cargar el archivo: ${error.message}`);
+      Swal.fire({
+        title: 'Error',
+        text: `Hubo un error al cargar el archivo: ${error.message}`,
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#d32f2f',
+      });
     } finally {
       setLoading(false);
       setOpen(false);
-      setFile(null); // Limpiar el archivo seleccionado
+      setFile(null);
     }
   };
 
@@ -124,6 +151,59 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
             <Typography variant="body1" sx={{ mb: 2 }}>
               Selecciona un archivo Excel para cargar los datos.
             </Typography>
+            {/* Espacio para la plantilla */}
+            <Box
+              sx={{
+                mb: 2,
+                p: 2,
+                border: '1px dashed #bdbdbd',
+                borderRadius: 2,
+                background: '#f9fafb',
+                width: '100%',
+                maxWidth: 400,
+              }}
+            >
+              <Typography variant="subtitle2" color="primary" fontWeight="bold" sx={{ mb: 1 }}>
+                Plantilla requerida:
+              </Typography>
+              <Box sx={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                  <thead>
+                    <tr style={{ background: '#e3e6f0' }}>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>nombre</th>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>valor_comercial</th>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>valor_unitario</th>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>lista_1</th>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>lista_2</th>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>lista_3</th>
+                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>cantidad</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>Producto A</td>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>10000</td>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>8000</td>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>9500</td>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>9000</td>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>8500</td>
+                      <td style={{ border: '1px solid #cfd8dc', padding: '4px' }}>50</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Box>
+              <Button
+                href="/plantilla.xlsx" // Cambia esto a la URL de tu plantilla
+                target="_blank"
+                download
+                variant="outlined"
+                size="small"
+                sx={{ mt: 1, borderColor: '#1976d2', color: '#1976d2' }}
+              >
+                Descargar plantilla
+              </Button>
+            </Box>
+            {/* Fin espacio plantilla */}
             <Button
               variant="outlined"
               component="label"

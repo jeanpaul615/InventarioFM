@@ -40,6 +40,45 @@ const HeaderCell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </TableCell>
 );
 
+// Nuevo componente HeaderCell empresarial
+const BusinessHeaderCell: React.FC<{ children: React.ReactNode; align?: 'left' | 'right' | 'center'; onClick?: () => void; active?: boolean }> = ({
+  children,
+  align = 'left',
+  onClick,
+  active = false,
+}) => (
+  <TableCell
+    align={align}
+    onClick={onClick}
+    sx={{
+      background: active
+        ? 'linear-gradient(90deg, #1e293b 0%, #334155 100%)'
+        : 'linear-gradient(90deg, #334155 0%, #64748b 100%)',
+      fontWeight: 'bold',
+      color: active ? '#FFD700' : '#F1F5F9',
+      padding: '18px 14px',
+      borderRight: '1px solid #e2e8f0',
+      borderBottom: '2.5px solid #0f172a',
+      fontSize: '1.08rem',
+      letterSpacing: '0.5px',
+      cursor: onClick ? 'pointer' : 'default',
+      boxShadow: active ? '0 2px 8px 0 rgba(30,41,59,0.10)' : undefined,
+      transition: 'background 0.2s, color 0.2s',
+      '&:hover': onClick
+        ? {
+            background: 'linear-gradient(90deg, #475569 0%, #1e293b 100%)',
+            color: '#FFD700',
+          }
+        : {},
+      textTransform: 'uppercase',
+      textAlign: align,
+      userSelect: 'none',
+    }}
+  >
+    {children}
+  </TableCell>
+);
+
 const ProductTableContent: React.FC<ProductTableContentProps> = ({
   products,
   onDelete,
@@ -65,47 +104,55 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
   );
 
   return (
-    <div className="bg-amber-50 flex flex-col space-y-4"> {/* Adjust container to reduce spacing */}
-      <TableContainer component={Paper} sx={{
-        backgroundColor: '#FFFBEB', // Código hexadecimal para bg-amber-50
-        minHeight: '100vh', // Asegura que el fondo cubra toda la pantalla
-      }} className="bg-amber-50 shadow-lg">
+    <div className="flex flex-col space-y-4 bg-gradient-to-br from-amber-50 to-gray-100 min-h-screen py-6">
+      <TableContainer
+        component={Paper}
+        sx={{
+          backgroundColor: 'rgba(255,251,235,0.97)',
+          minHeight: '70vh',
+          borderRadius: '18px',
+          boxShadow: '0 8px 32px 0 rgba(30,41,59,0.13)',
+          border: '1.5px solid #e2e8f0',
+          overflow: 'hidden',
+        }}
+        className="shadow-2xl"
+      >
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell
+              <BusinessHeaderCell
                 onClick={onSortById}
-                sx={{
-                  background: 'linear-gradient(to right, #beb7b7, #5b5757)',
-                  fontWeight: 'bold',
-                  color: 'white',
-                  padding: '16px',
-                  borderRight: '1px solid #e0e0e0',
-                  cursor: 'pointer',
-                }}
+                active
+                align="center"
               >
                 ID {sortOrder === 'asc' ? '↑' : '↓'}
-              </TableCell>
-              <HeaderCell>Nombre</HeaderCell>
-              <HeaderCell>Valor Comercial</HeaderCell>
-              <HeaderCell>Valor Unitario</HeaderCell>
-              <HeaderCell>Lista 1</HeaderCell>
-              <HeaderCell>Lista 2</HeaderCell>
-              <HeaderCell>Lista 3</HeaderCell>
-              <HeaderCell>Cantidad</HeaderCell>
-              <HeaderCell>Acciones</HeaderCell>
+              </BusinessHeaderCell>
+              <BusinessHeaderCell>Nombre</BusinessHeaderCell>
+              <BusinessHeaderCell align="right">Valor Comercial</BusinessHeaderCell>
+              <BusinessHeaderCell align="right">Valor Unitario</BusinessHeaderCell>
+              <BusinessHeaderCell align="right">Lista 1</BusinessHeaderCell>
+              <BusinessHeaderCell align="right">Lista 2</BusinessHeaderCell>
+              <BusinessHeaderCell align="right">Lista 3</BusinessHeaderCell>
+              <BusinessHeaderCell align="right">Cantidad</BusinessHeaderCell>
+              <BusinessHeaderCell align="center">Acciones</BusinessHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {paginatedProducts.map((product, index) => (
               <TableRow
                 key={product.id}
-                sx={{ backgroundColor: index % 2 === 0 ? 'white' : '#f5f5f5' }}
+                sx={{
+                  backgroundColor: index % 2 === 0 ? '#fff' : '#f8fafc',
+                  transition: 'background 0.2s',
+                  '&:hover': {
+                    backgroundColor: '#ffe082',
+                  },
+                }}
               >
-                <TableCell>{product.id}</TableCell>
+                <TableCell sx={{ fontWeight: 500 }}>{product.id}</TableCell>
                 <TableCell>{product.nombre}</TableCell>
-                <TableCell>{product.valor_comercial}</TableCell>
-                <TableCell>{product.valor_unitario}</TableCell>
+                <TableCell>${product.valor_comercial.toLocaleString()}</TableCell>
+                <TableCell>${product.valor_unitario.toLocaleString()}</TableCell>
                 <TableCell>{product.lista_1}</TableCell>
                 <TableCell>{product.lista_2}</TableCell>
                 <TableCell>{product.lista_3}</TableCell>
@@ -113,12 +160,24 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
                 <TableCell>
                   <div className="flex space-x-2">
                     <UpdateProduct product={product} onUpdate={onUpdate} />
-                    <Button sx={{
-                      backgroundColor: '#da0007',
-                      '&:hover': { backgroundColor: '#ffa8aa', boxShadow: 'none', borderColor: '#c0edff', color: '#da0007' },
-                      fontWeight: 'bold',
-                    }} variant="contained" color="error" onClick={() => onDelete(product.id)}>
-                      Delete
+                    <Button
+                      sx={{
+                        backgroundColor: '#da0007',
+                        '&:hover': {
+                          backgroundColor: '#ffd6d6',
+                          color: '#da0007',
+                          boxShadow: '0 2px 8px 0 rgba(218,0,7,0.15)',
+                        },
+                        fontWeight: 'bold',
+                        borderRadius: '8px',
+                        fontSize: '0.95rem',
+                        textTransform: 'none',
+                      }}
+                      variant="contained"
+                      color="error"
+                      onClick={() => onDelete(product.id)}
+                    >
+                      ELIMINAR
                     </Button>
                   </div>
                 </TableCell>
