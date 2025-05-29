@@ -5,26 +5,26 @@ import { AppService } from './services/app.service';
 import { User } from './entities/user.entity';
 import { Product } from './entities/product.entity';
 import { ProductService } from './services/product.service';
+import { Bill } from './entities/bill.entity';
+import { BillProduct } from './entities/bill-product.entity';
+import { BillService } from './services/bill.service';
 import { BillProductService } from './services/bill-product.service';
-import { ProductController } from './controllers/product.controller';
-import { BillProductController } from './controllers/bill-product.controller';
-import { Factura } from './entities/bill.entity';
-import { FacturaProducto } from './entities/bill-product.entity';
+import { BillController } from './controllers/bill.controller'; 
+import { BillProductController } from './controllers/bill-product.controller'; 
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'database.sqlite',
-      entities: [User, Product, FacturaProducto, Factura],
+      entities: [User, Product, Bill, BillProduct], 
       logging: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Product, FacturaProducto, Factura]),
+    TypeOrmModule.forFeature([User, Product, BillProduct, Bill]),
   ],
-  controllers: [AppController, ProductController, BillProductController],
-  providers: [AppService, ProductService, BillProductService],
+  controllers: [AppController, BillController, BillProductController], 
+  providers: [AppService, ProductService, BillProductService, BillService],
   exports: [TypeOrmModule],
 })
 export class AppModule {}
-
