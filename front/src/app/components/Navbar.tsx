@@ -27,9 +27,9 @@ import { styled } from '@mui/system';
 const NAVIGATION = [
   { title: 'Inventario', icon: <HomeIcon />, path: '/' },
   { title: 'Facturacion', icon: <InfoIcon />, path: '/billing' },
-  { title: 'Cotizacion', icon: <ContactMailIcon />, path: '/cotizacion' },
-  { title: 'Inicio de Sesion', icon: <LoginIcon />, path: '/login' },
-  { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { title: 'Cotizacion', icon: <ContactMailIcon />, path: '/quotes' },
+  { title: 'Registro de Facturas', icon: <LoginIcon />, path: '/billinglist' },
+  { title: 'Registro de Cotizaciones', icon: <DashboardIcon />, path: '/quoteslist' },
 ];
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
