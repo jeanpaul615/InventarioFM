@@ -11,6 +11,7 @@ import { BillService } from './services/bill.service';
 import { BillProductService } from './services/bill-product.service';
 import { BillController } from './controllers/bill.controller'; 
 import { BillProductController } from './controllers/bill-product.controller'; 
+import { ProductController } from './controllers/product.controller';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { BillProductController } from './controllers/bill-product.controller';
     }),
     TypeOrmModule.forFeature([User, Product, BillProduct, Bill]),
   ],
-  controllers: [AppController, BillController, BillProductController], 
+  controllers: [AppController, ProductController, BillController, BillProductController], 
   providers: [AppService, ProductService, BillProductService, BillService],
   exports: [TypeOrmModule],
 })
