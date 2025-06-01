@@ -27,7 +27,7 @@ import { styled } from '@mui/system';
 const NAVIGATION = [
   { title: 'Inventario', icon: <HomeIcon />, path: '/' },
   { title: 'Facturacion', icon: <InfoIcon />, path: '/billing' },
-  { title: 'Cotizacion', icon: <ContactMailIcon />, path: '/quotes' },
+  { title: 'Clientes', icon: <ContactMailIcon />, path: '/customer' },
   { title: 'Registro de Facturas', icon: <LoginIcon />, path: '/billinglist' },
   { title: 'Registro de Cotizaciones', icon: <DashboardIcon />, path: '/quoteslist' },
 ];

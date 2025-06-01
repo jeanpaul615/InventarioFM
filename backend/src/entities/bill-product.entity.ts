@@ -10,7 +10,7 @@ export class BillProduct {
   @ManyToOne(() => Bill, bill => bill.billProducts)
   bill: Bill;
 
-  @ManyToOne(() => Product, product => product.billProducts)
+  @ManyToOne(() => Product, (product) => product.billProducts)
   product: Product;
 
   @Column()
