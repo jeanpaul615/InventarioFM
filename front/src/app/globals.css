@@ -5,7 +5,18 @@
   --foreground: #171717;
 }
 
-@theme inline {
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+table {
+    width: 100% !important;
+  }
+
+
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -19,11 +30,13 @@
   }
 }
 
-@media print {
-  .no-print {
-    display: none !important;
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;  
   }
 }
+
 body {
   background: var(--background);
   color: var(--foreground);

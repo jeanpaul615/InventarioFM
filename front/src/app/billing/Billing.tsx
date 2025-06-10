@@ -83,12 +83,23 @@ const Billing: React.FC = () => {
     const invoiceElement = document.getElementById("invoice");
     if (!invoiceElement) return;
 
+    // Ocultar elementos no imprimibles antes de generar el PDF
+    const nonPrintableElements = invoiceElement.getElementsByClassName('no-print');
+    Array.from(nonPrintableElements).forEach((element: Element) => {
+      (element as HTMLElement).style.display = 'none';
+    });
+
     // Aumenta la resolución del canvas
     const scale = 4;
     const canvas = await html2canvas(invoiceElement, {
       scale,
-      backgroundColor: "#fff", // Fondo blanco
+      backgroundColor: "#fff",
       useCORS: true,
+    });
+
+    // Restaurar elementos no imprimibles
+    Array.from(nonPrintableElements).forEach((element: Element) => {
+      (element as HTMLElement).style.display = '';
     });
 
     const imgData = canvas.toDataURL("image/png", 1.0);
