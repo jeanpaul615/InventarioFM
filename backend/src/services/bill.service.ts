@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Bill } from '../entities/bill.entity';
 import { Customer } from '../entities/customer.entity';
+import { BillProduct } from '../entities/bill-product.entity';
 
 @Injectable()
 export class BillService {
@@ -11,6 +12,8 @@ export class BillService {
     private billRepository: Repository<Bill>,
     @InjectRepository(Customer)
     private customerRepository: Repository<Customer>,
+    @InjectRepository(BillProduct)
+    private billProductRepository: Repository<BillProduct>,
   ) {}
 
   async create(data: Partial<Bill> & { customer: number }) {
@@ -44,5 +47,21 @@ export class BillService {
         'billProducts.product', // <-- ya está bien aquí
       ],
     });
+  }
+
+  async removeProductFromBill(billId: number, productId: number) {
+    // Busca el BillProduct correspondiente
+    const billProduct = await this.billProductRepository.findOne({
+      where: {
+        bill: { id: billId },
+        product: { id: productId },
+      },
+      relations: ['bill', 'product'],
+    });
+    if (!billProduct) {
+      throw new Error('Producto no encontrado en la factura');
+    }
+    await this.billProductRepository.remove(billProduct);
+    return { message: 'Producto eliminado de la factura' };
   }
 }

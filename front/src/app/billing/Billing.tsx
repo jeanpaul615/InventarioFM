@@ -290,6 +290,28 @@ const Billing: React.FC = () => {
     }, {} as Record<number, InventoryItem & { quantity: number }>)
   );
 
+  const handleRemoveProduct = async (productId: number) => {
+    if (!currentBillId) return;
+    try {
+      const response = await fetch(`http://localhost:8000/bills/${currentBillId}/products/${productId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        showAlert(errorData.message || "No se pudo eliminar el producto", "error");
+        return;
+      }
+      setSelectedItems(selectedItems.filter(({ item }) => item.id !== productId));
+      showAlert("Producto eliminado de la factura", "success");
+      const newTotal = selectedItems
+        .filter(({ item }) => item.id !== productId)
+        .reduce((acc, curr) => acc + curr.item.price * curr.quantity, 0);
+      setTotal(newTotal);
+    } catch (error: any) {
+      showAlert(error?.message || "Error al eliminar el producto", "error");
+    }
+  };
+
   return (
     <Box sx={{ p: 5, backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
       {/* Header */}
@@ -580,6 +602,19 @@ const Billing: React.FC = () => {
                 >
                   Subtotal
                 </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#1565c0",
+                    fontWeight: 800,
+                    fontSize: 16,
+                    borderBottom: "2.5px solid #b0bec5",
+                    letterSpacing: 1,
+                    textAlign: "center",
+                  }}
+                  className="no-print"
+                >
+                  Eliminar
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -607,6 +642,16 @@ const Billing: React.FC = () => {
                     </TableCell>
                     <TableCell sx={{ color: "#1565c0", fontWeight: 700, textAlign: "center" }}>
                       ${(item.price * item.quantity).toLocaleString()}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }} className="no-print">
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => handleRemoveProduct(item.id)}
+                      >
+                        Eliminar
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))

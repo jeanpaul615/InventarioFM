@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { BillService } from '../services/bill.service';
 import { Bill } from '../entities/bill.entity';
 
@@ -19,5 +19,13 @@ export class BillController {
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.billService.findOne(Number(id));
+  }
+
+  @Delete(':billId/products/:productId')
+  async removeProductFromBill(
+    @Param('billId', ParseIntPipe) billId: number,
+    @Param('productId', ParseIntPipe) productId: number,
+  ) {
+    return this.billService.removeProductFromBill(billId, productId);
   }
 }

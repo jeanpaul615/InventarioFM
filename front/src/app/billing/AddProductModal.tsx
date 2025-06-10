@@ -25,6 +25,13 @@ import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
 import axios from "axios";
 import { useApi } from "../context/ApiContext";
 
+interface BillingItem {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+}
+
 interface InventoryItem {
   id: number;
   nombre: string;
@@ -37,7 +44,7 @@ interface InventoryItem {
 interface AddProductModalProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (item: InventoryItem, quantity: number) => void;
+  onAdd: (item: BillingItem, quantity: number) => void;
   billId: number | null;
 }
 
@@ -106,10 +113,18 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
           product: selected.id,
           nombre: selected.nombre,
           quantity,
-          price: selected[listaSeleccionada],
+          price: Number(selected[listaSeleccionada]),
         });
-        // Pasar el producto seleccionado directamente, ya que onAdd espera un InventoryItem
-        onAdd(selected, quantity);
+
+        // Transform the data to match what Billing expects
+        const billingItem: BillingItem = {
+          id: selected.id,
+          name: selected.nombre,
+          price: Number(selected[listaSeleccionada]),
+          stock: selected.cantidad
+        };
+
+        onAdd(billingItem, quantity);
         setSelected(null);
         setSearch("");
         setQuantity(1);
