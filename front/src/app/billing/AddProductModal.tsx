@@ -108,13 +108,13 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
           quantity,
           price: selected[listaSeleccionada],
         });
+        // Pasar el producto seleccionado directamente, ya que onAdd espera un InventoryItem
         onAdd(selected, quantity);
         setSelected(null);
         setSearch("");
         setQuantity(1);
         setAdding(false);
         onClose();
-        window.location.reload();
       } catch (error) {
         setAdding(false);
         alert("No se pudo agregar el producto a la factura.");
