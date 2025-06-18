@@ -352,17 +352,11 @@ const BillView: React.FC = () => {
               Subtotal:
             </Typography>
             <Typography variant="body1" sx={{ color: "#222", fontWeight: 600 }}>
-              ${getTotal().toLocaleString()}
-            </Typography>
-            <Typography variant="subtitle2" sx={{ color: "#607d8b", fontWeight: 500 }}>
-              IVA (19%):
-            </Typography>
-            <Typography variant="body1" sx={{ color: "#222", fontWeight: 600 }}>
-              ${(getTotal() * 0.19).toLocaleString()}
+              ${(getTotal()).toLocaleString()}
             </Typography>
             <Divider sx={{ my: 1 }} />
             <Typography variant="h6" sx={{ color: "#1565c0", fontWeight: 700 }}>
-              Total a Pagar: ${(getTotal() * 1.19).toLocaleString()}
+              Total a Pagar: ${(getTotal()).toLocaleString()}
             </Typography>
           </Box>
         </Box>

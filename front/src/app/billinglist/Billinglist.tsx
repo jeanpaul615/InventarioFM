@@ -211,7 +211,7 @@ const BillingList: React.FC = () => {
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={isMobile ? [5, 8, 10] : [5, 8, 10, 25, 50]}
+          rowsPerPageOptions={isMobile ? [5, 8, 10, 20, 50] : [5, 8, 10, 25, 50, 100]}
           labelRowsPerPage="Filas por página"
           sx={{
             ".MuiTablePagination-toolbar": {

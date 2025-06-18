@@ -356,15 +356,14 @@ const Billing: React.FC = () => {
           }}
         />
         <Divider sx={{ mb: 2 }} />
-        <Box sx={{ mb: 2 }}>
-          <strong>Cliente:</strong>{" "}
-          {customerName || <span style={{ color: "#bdbdbd" }}>Sin nombre</span>}
-        </Box>
-        <InvoiceTable
-          groupedItems={groupedItems}
-          handleQuantityChange={handleQuantityChange}
-          handleRemoveProduct={handleRemoveProduct}
-        />
+      <InvoiceTable
+        groupedItems={groupedItems}
+        billId={currentBillId!}
+        handleQuantityChange={handleQuantityChange}
+        handleRemoveProduct={handleRemoveProduct}
+        total={total}
+        updateTotal={setTotal}
+      />
         <InvoiceTotals total={total} />
         <Divider sx={{ my: 2 }} />
         <InvoiceFooter />

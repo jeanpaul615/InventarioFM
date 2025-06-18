@@ -13,7 +13,7 @@ export class BillService {
     @InjectRepository(Customer)
     private customerRepository: Repository<Customer>,
     @InjectRepository(BillProduct)
-    private billProductRepository: Repository<BillProduct>,
+    private readonly billProductRepository: Repository<BillProduct>,
   ) {}
 
   async create(data: Partial<Bill> & { customer: number }) {
@@ -63,5 +63,22 @@ export class BillService {
     }
     await this.billProductRepository.remove(billProduct);
     return { message: 'Producto eliminado de la factura' };
+  }
+
+  async updateProductQuantityInBill(billId: number, productId: number, newQuantity: number): Promise<BillProduct> {
+    const billProduct = await this.billProductRepository.findOne({
+      where: {
+        bill: { id: billId },
+        product: { id: productId },
+      },
+      relations: ['bill', 'product'],
+    });
+
+    if (!billProduct) {
+      throw new Error('Producto no encontrado en la factura');
+    }
+
+    billProduct.quantity = newQuantity;
+    return this.billProductRepository.save(billProduct);
   }
 }
