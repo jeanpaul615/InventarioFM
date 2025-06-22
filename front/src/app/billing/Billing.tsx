@@ -321,6 +321,39 @@ const Billing: React.FC = () => {
     // Si quieres persistir en backend, aquí puedes hacer un fetch PATCH/PUT
   };
 
+  // Sincroniza inventario y factura: descuenta stock y setea la factura
+  const handleSyncStockAndBill = async () => {
+    if (!currentBillId) {
+      showAlert("No hay factura activa para modificar.", "warning");
+      return;
+    }
+    try {
+      // 1. Actualizar el stock de cada producto en el backend
+      for (const { item, quantity } of selectedItems) {
+        await fetch(`http://localhost:8000/products/${item.id}/decrement-stock`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quantity }),
+        });
+      }
+      // 2. Setear la factura como finalizada (o el estado que corresponda)
+      await fetch(`http://localhost:8000/bills/${currentBillId}/finalize`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
+      // 3. Reiniciar la factura (limpiar estado y localStorage)
+      setCurrentBillId(null);
+      setSelectedItems([]);
+      setTotal(0);
+      setCustomerName("");
+      localStorage.removeItem("currentBillId");
+      localStorage.removeItem("customerName");
+      showAlert("Inventario actualizado y factura finalizada. Factura reiniciada.", "success");
+    } catch (error) {
+      showAlert("Error al actualizar inventario o factura", "error");
+    }
+  };
+
   return (
     <Box sx={{ p: 5, backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
       <BillingHeader currentBillId={currentBillId} />
@@ -328,6 +361,7 @@ const Billing: React.FC = () => {
       <BillingButtons
         onAddProduct={handleOpenAddModal}
         onDownloadPDF={handleGeneratePDF}
+        onSyncStock={handleSyncStockAndBill}
       />
       <CustomerForm onSubmit={(customer) => handleCreateBill(customer.nombre)} />
       <Box

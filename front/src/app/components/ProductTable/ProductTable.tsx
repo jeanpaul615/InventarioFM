@@ -26,7 +26,15 @@ const ProductTable: React.FC = () => {
 
   const fetchProducts = async () => {
     const response = await axios.get(`${baseUrl}/products`);
-    setProducts(response.data);
+    // Si la respuesta es paginada, usa response.data.items
+    const data = response.data;
+    if (Array.isArray(data)) {
+      setProducts(data);
+    } else if (Array.isArray(data.items)) {
+      setProducts(data.items);
+    } else {
+      setProducts([]);
+    }
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {

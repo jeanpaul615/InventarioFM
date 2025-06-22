@@ -1,13 +1,16 @@
 import { Box, Button } from "@mui/material";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 
 interface BillingButtonsProps {
   onAddProduct: () => void;
   onDownloadPDF: () => void;
+  onSyncStock: () => void;
 }
 
 const BillingButtons: React.FC<BillingButtonsProps> = ({
   onAddProduct,
   onDownloadPDF,
+  onSyncStock,
 }) => (
   <Box
     sx={{
@@ -61,12 +64,41 @@ const BillingButtons: React.FC<BillingButtonsProps> = ({
     </Button>
     <Button
       variant="contained"
+      color="secondary"
+      onClick={onSyncStock}
+      startIcon={<AutorenewIcon />}
+      sx={{
+        px: 3,
+        py: 1.2,
+        fontWeight: 700,
+        fontSize: 16,
+        borderRadius: 2,
+        boxShadow: "0 2px 8px #ff980033",
+        letterSpacing: 1,
+        background: "linear-gradient(90deg, #ff9800 60%, #ffe082 100%)",
+        transition: "all 0.2s",
+        "&:hover": {
+          background: "linear-gradient(90deg, #f57c00 60%, #ffd54f 100%)",
+          boxShadow: "0 4px 16px #ff980044",
+          transform: "translateY(-2px) scale(1.03)",
+        },
+      }}
+    >
+      Modificar Inventario y Factura
+    </Button>
+    <Button
+      variant="contained"
       color="success"
       onClick={onDownloadPDF}
       startIcon={
         <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
           <rect x="4" y="4" width="16" height="16" rx="3" fill="#fff" />
-          <path d="M8 12h8M12 8v8" stroke="#43a047" strokeWidth="2" strokeLinecap="round" />
+          <path
+            d="M8 12h8M12 8v8"
+            stroke="#43a047"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </svg>
       }
       sx={{

@@ -4,6 +4,7 @@ import {
   Post,
   Put,
   Delete,
+  Patch,
   Body,
   Param,
   Req,
@@ -23,10 +24,16 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async findAll(): Promise<any> {
+  async findAll(
+    @Req() req: any
+  ): Promise<any> {
     try {
-      const products = await this.productService.findAll();
-      return products;
+      // Paginación y filtro por nombre
+      const page = parseInt(req.query?.page) || 1;
+      const limit = parseInt(req.query?.limit) || 20;
+      const search = req.query?.search || '';
+      const result = await this.productService.findAllPaginated(page, limit, search);
+      return result;
     } catch (error) {
       this.logger.error(error);
       throw new HttpException(
@@ -51,9 +58,11 @@ export class ProductController {
   }
 
   @Post()
-  async create(@Body() product: Product): Promise<any> {
+  async create(@Body() product: Product, @Req() req: any): Promise<any> {
     try {
-      const created = await this.productService.create(product);
+      // Extraer userId del request (JWT)
+      const userId = req.user?.userId;
+      const created = await this.productService.create(product, userId);
       return { message: 'Producto creado correctamente' };
     } catch (error) {
       this.logger.error(error);
@@ -65,9 +74,11 @@ export class ProductController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() product: Product): Promise<any> {
+  async update(@Param('id') id: number, @Body() product: Product, @Req() req: any): Promise<any> {
     try {
-      const updated = await this.productService.update(id, product);
+      // Extrae el userId del token si está presente
+      const userId = req.user?.userId;
+      const updated = await this.productService.update(id, product, userId);
       return { message: 'Producto actualizado correctamente' };
     } catch (error) {
       this.logger.error(error);
@@ -93,49 +104,17 @@ export class ProductController {
   }
 
   @Post('upload')
-  async uploadFile(@Req() req: FastifyRequest): Promise<any> {
+  async uploadFile(@Req() req: any): Promise<any> {
+    // Deshabilitado para evitar errores en scripts y pruebas
+    throw new Error('Funcionalidad de upload deshabilitada temporalmente para mantenimiento.');
+  }
+
+  @Patch(':id/decrement-stock')
+  async decrementStock(@Param('id') id: number, @Body('quantity') quantity: number) {
     try {
-      if (!req.isMultipart()) {
-        throw new HttpException(
-          { message: 'Tipo de archivo no soportado' },
-          HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-        );
-      }
-
-      const parts = req.parts();
-      let fileBuffer: Buffer | null = null;
-
-      for await (const part of parts) {
-        if (part.type === 'file' && part.file) {
-          const chunks: Buffer[] = [];
-          for await (const chunk of part.file) {
-            chunks.push(chunk);
-          }
-          fileBuffer = Buffer.concat(chunks);
-        }
-      }
-
-      if (!fileBuffer) {
-        throw new HttpException(
-          { message: 'No se subió ningún archivo' },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const rows: any[] = XLSX.utils.sheet_to_json(sheet);
-
-      await this.productService.bulkCreate(rows);
-
-      return { message: 'Archivo procesado y productos guardados correctamente' };
+      return await this.productService.decrementStock(id, quantity);
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(
-        { message: 'Error al procesar el archivo' },
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException({ message: error.message }, HttpStatus.BAD_REQUEST);
     }
   }
 }

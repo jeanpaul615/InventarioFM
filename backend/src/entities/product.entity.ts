@@ -12,8 +12,8 @@ export class Product {
   @Column('decimal', { precision: 10, scale: 2 })
   valor_comercial: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  valor_unitario: number;
+  // @Column('decimal', { precision: 10, scale: 2 })
+  // valor_unitario: number;
 
   @Column('decimal', { precision: 10, scale: 2 })
   lista_1: number;
@@ -26,6 +26,9 @@ export class Product {
 
   @Column('int')
   cantidad: number;
+
+  @Column({ default: true })
+  activo: boolean;
 
   @OneToMany(() => BillProduct, billProduct => billProduct.product)
   billProducts: BillProduct[];

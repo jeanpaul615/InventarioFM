@@ -81,4 +81,11 @@ export class BillService {
     billProduct.quantity = newQuantity;
     return this.billProductRepository.save(billProduct);
   }
+
+  async finalizeBill(billId: number) {
+    const bill = await this.billRepository.findOne({ where: { id: billId } });
+    if (!bill) throw new Error('Factura no encontrada');
+    bill.finalizada = true;
+    return this.billRepository.save(bill);
+  }
 }

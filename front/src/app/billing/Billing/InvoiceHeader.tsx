@@ -47,7 +47,7 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({ currentBillId, customer }
             variant={isSmallScreen ? "h6" : "h5"}
             sx={{ fontWeight: 900, color: "#1976d2", letterSpacing: 1 }}
           >
-            FERREMOLINA S.A.S.
+            DISTRIBUCIONES FERREMOLINA
           </Typography>
           <Typography sx={{ color: "#455a64", fontSize: isSmallScreen ? 12 : 14 }}>
             Calle 8 Bis N. 37-22, Pereira, Risaralda
@@ -56,7 +56,7 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({ currentBillId, customer }
             Tel: +57 312 346 7272
           </Typography>
           <Typography sx={{ color: "#455a64", fontSize: isSmallScreen ? 12 : 14 }}>
-            Email: <span style={{ color: "#1976d2" }}>cabran112@gmail.com</span>
+            Email: <span style={{ color: "#1976d2" }}>ventas.ferremolina@gmail.com</span>
           </Typography>
         </Box>
         <Box sx={{ flex: 1 }} />

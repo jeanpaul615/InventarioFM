@@ -13,6 +13,7 @@ import {
   ListItemIcon,
   Divider,
   Box,
+  Button,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -20,16 +21,23 @@ import InfoIcon from '@mui/icons-material/Info';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import LoginIcon from '@mui/icons-material/Login';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
+import LockResetIcon from '@mui/icons-material/LockReset';
 
 import { useRouter } from 'next/navigation'
 import { styled } from '@mui/system';
+import { useApi } from '../context/ApiContext';
 
 const NAVIGATION = [
   { title: 'Inventario', icon: <HomeIcon />, path: '/' },
   { title: 'Facturacion', icon: <InfoIcon />, path: '/billing' },
   { title: 'Clientes', icon: <ContactMailIcon />, path: '/customer' },
   { title: 'Registro de Facturas', icon: <LoginIcon />, path: '/billinglist' },
+  { title: 'Cotización', icon: <AssignmentIcon />, path: '/quotation' },
   { title: 'Registro de Cotizaciones', icon: <DashboardIcon />, path: '/quoteslist' },
+  { title: 'Ingresos Inventario', icon: <AssignmentIcon />, path: '/inventorylog/list' },
 ];
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
@@ -46,6 +54,7 @@ const Navbar: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { user, logout } = useApi();
 
   useEffect(() => {
     setMounted(true);
@@ -76,6 +85,41 @@ const Navbar: React.FC = () => {
             <MenuIcon />
           </IconButton>
           <h1 className="pt-7 text-3xl font-bold text-amber-400 mb-6 text-center">INVENTARIO FERREMOLINA</h1>
+          <Box sx={{ flex: 1 }} />
+          {user ? (
+            <>
+              <Typography sx={{ color: '#fff', fontWeight: 700, mr: 2 }}>
+                <PersonIcon sx={{ verticalAlign: 'middle', mr: 0.5 }} /> {user.username}
+              </Typography>
+              <Button
+                color="inherit"
+                startIcon={<LogoutIcon />}
+                onClick={() => { logout(); window.location.href = '/login'; }}
+                sx={{ fontWeight: 700, borderRadius: 2, background: '#ff6600', color: '#fff', ml: 1, '&:hover': { background: '#b26a00' } }}
+              >
+                Cerrar sesión
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                color="inherit"
+                startIcon={<PersonIcon />}
+                onClick={() => router.push('/login')}
+                sx={{ fontWeight: 700, borderRadius: 2, background: '#ff6600', color: '#fff', ml: 1, '&:hover': { background: '#b26a00' } }}
+              >
+                Iniciar sesión
+              </Button>
+              <Button
+                color="inherit"
+                startIcon={<LockResetIcon />}
+                onClick={() => router.push('/forgot-password')}
+                sx={{ fontWeight: 700, borderRadius: 2, background: '#fff3e0', color: '#ff6600', ml: 1, '&:hover': { background: '#ffe0b2' } }}
+              >
+                Recuperar contraseña
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       <StyledDrawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>

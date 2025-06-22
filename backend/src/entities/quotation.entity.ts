@@ -1,21 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToOne } from 'typeorm';
-import { BillProduct } from './bill-product.entity';
 import { Customer } from './customer.entity';
+import { QuotationProduct } from './quotation-product.entity';
 
 @Entity()
-export class Bill {
+export class Quotation {
   @PrimaryGeneratedColumn()
   id: number;
 
   @CreateDateColumn()
   date: Date;
 
-  @OneToMany(() => BillProduct, billProduct => billProduct.bill)
-  billProducts: BillProduct[];
+  @OneToMany(() => QuotationProduct, qp => qp.quotation, { cascade: true })
+  quotationProducts: QuotationProduct[];
 
   @ManyToOne(() => Customer, { eager: true })
   customer: Customer;
-
-  @Column({ default: false })
-  finalizada: boolean;
 }

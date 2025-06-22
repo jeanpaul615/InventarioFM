@@ -18,6 +18,7 @@ import {
   Tooltip,
   Snackbar,
   Alert,
+  MenuItem,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,6 +30,10 @@ import { useApi } from "../context/ApiContext";
 interface Customer {
   id: number;
   nombre: string;
+  cedula?: string;
+  telefono?: string;
+  direccion?: string;
+  caracterizacion?: "lista_1" | "lista_2" | "lista_3";
 }
 
 const CustomerPage: React.FC = () => {
@@ -37,7 +42,7 @@ const CustomerPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState<Customer | null>(null);
-  const [form, setForm] = useState({ nombre: "" });
+  const [form, setForm] = useState({ nombre: "", cedula: "", telefono: "", direccion: "", caracterizacion: "lista_1" });
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
   const [addOpen, setAddOpen] = useState(false);
 
@@ -62,6 +67,10 @@ const CustomerPage: React.FC = () => {
     setSelected(customer);
     setForm({
       nombre: customer.nombre,
+      cedula: customer.cedula || "",
+      telefono: customer.telefono || "",
+      direccion: customer.direccion || "",
+      caracterizacion: customer.caracterizacion || "lista_1",
     });
     setEditOpen(true);
   };
@@ -106,7 +115,7 @@ const CustomerPage: React.FC = () => {
       await axios.post(`${baseUrl}/customers`, form);
       setSnackbar({ open: true, message: "Cliente agregado", severity: "success" });
       setAddOpen(false);
-      setForm({ nombre: "" });
+      setForm({ nombre: "", cedula: "", telefono: "", direccion: "", caracterizacion: "lista_1" });
       fetchCustomers();
     } catch {
       setSnackbar({ open: true, message: "Error al agregar cliente", severity: "error" });
@@ -114,12 +123,12 @@ const CustomerPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 700, mx: "auto", mt: 6, p: { xs: 1, sm: 3 }, background: "#f8fafc", borderRadius: 3, boxShadow: 3 }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+    <Box sx={{ maxWidth: 900, mx: "auto", mt: 6, p: { xs: 2, sm: 4 }, background: "#f4f8fb", borderRadius: 4, boxShadow: 6 }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <PersonIcon color="primary" sx={{ fontSize: 36 }} />
-          <Typography variant="h4" fontWeight={700} color="primary.dark">
-            Clientes
+          <PersonIcon color="primary" sx={{ fontSize: 44 }} />
+          <Typography variant="h4" fontWeight={800} color="primary.dark" letterSpacing={1}>
+            Gestión de Clientes
           </Typography>
         </Box>
         <Button
@@ -127,26 +136,29 @@ const CustomerPage: React.FC = () => {
           color="primary"
           startIcon={<AddIcon />}
           sx={{
-            borderRadius: 2,
+            borderRadius: 3,
             fontWeight: 700,
-            px: 3,
-            boxShadow: "0 2px 8px #1976d233",
+            px: 4,
+            py: 1.5,
+            fontSize: 18,
+            boxShadow: "0 4px 16px #1976d244",
             background: "linear-gradient(90deg, #1976d2 60%, #64b5f6 100%)",
+            transition: "all 0.2s",
             "&:hover": {
               background: "linear-gradient(90deg, #1565c0 60%, #42a5f5 100%)",
-              boxShadow: "0 4px 16px #1976d244",
-              transform: "translateY(-2px) scale(1.03)",
+              boxShadow: "0 6px 24px #1976d255",
+              transform: "translateY(-2px) scale(1.04)",
             },
           }}
           onClick={() => {
-            setForm({ nombre: "" });
+            setForm({ nombre: "", cedula: "", telefono: "", direccion: "", caracterizacion: "lista_1" });
             setAddOpen(true);
           }}
         >
           Nuevo Cliente
         </Button>
       </Box>
-      <Paper elevation={0} sx={{ borderRadius: 3, boxShadow: 1, p: 0, background: "#fff" }}>
+      <Paper elevation={2} sx={{ borderRadius: 4, boxShadow: 2, p: 0, background: "#fff" }}>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight={120}>
             <CircularProgress />
@@ -154,8 +166,8 @@ const CustomerPage: React.FC = () => {
         ) : (
           <List>
             {customers.length === 0 && (
-              <Box sx={{ textAlign: "center", py: 4, color: "#bdbdbd" }}>
-                <Typography variant="body1">No hay clientes registrados.</Typography>
+              <Box sx={{ textAlign: "center", py: 5, color: "#bdbdbd" }}>
+                <Typography variant="body1" fontSize={18}>No hay clientes registrados.</Typography>
               </Box>
             )}
             {customers.map((customer) => (
@@ -163,13 +175,13 @@ const CustomerPage: React.FC = () => {
                 key={customer.id}
                 secondaryAction={
                   <Box>
-                    <Tooltip title="Editar">
-                      <IconButton edge="end" color="primary" onClick={() => handleEdit(customer)}>
+                    <Tooltip title="Editar" arrow>
+                      <IconButton edge="end" color="primary" onClick={() => handleEdit(customer)} sx={{ mx: 0.5, bgcolor: "#e3f2fd", '&:hover': { bgcolor: "#bbdefb" } }}>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Eliminar">
-                      <IconButton edge="end" color="error" onClick={() => handleDelete(customer.id)}>
+                    <Tooltip title="Eliminar" arrow>
+                      <IconButton edge="end" color="error" onClick={() => handleDelete(customer.id)} sx={{ mx: 0.5, bgcolor: "#ffebee", '&:hover': { bgcolor: "#ffcdd2" } }}>
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
@@ -177,16 +189,26 @@ const CustomerPage: React.FC = () => {
                 }
                 sx={{
                   borderBottom: "1px solid #e0e0e0",
-                  "&:last-child": { borderBottom: "none" },
-                  transition: "background 0.2s",
-                  "&:hover": { background: "#f3f7fa" },
+                  transition: "background 0.2s, box-shadow 0.2s",
+                  borderRadius: 2,
+                  mb: 1,
+                  px: 2,
+                  py: 2,
+                  background: "#f9fbfd",
+                  boxShadow: "0 1px 4px #e3eafc55",
+                  '&:hover': { background: "#e3f2fd", boxShadow: "0 2px 8px #bbdefb55" },
                 }}
               >
                 <ListItemText
                   primary={
-                    <Typography fontWeight={600} fontSize={18} color="#263238">
-                      {customer.nombre}
-                    </Typography>
+                    <React.Fragment>
+                      <Typography fontWeight={700} fontSize={20} color="#263238">
+                        {customer.nombre}
+                      </Typography>
+                      <Typography fontSize={15} color="#607d8b" mt={0.5}>
+                        <b>Cédula/NIT:</b> {customer.cedula || "-"} &nbsp;|&nbsp; <b>Tel:</b> {customer.telefono || "-"} &nbsp;|&nbsp; <b>Dir:</b> {customer.direccion || "-"} &nbsp;|&nbsp; <b>Lista:</b> {customer.caracterizacion || "-"}
+                      </Typography>
+                    </React.Fragment>
                   }
                 />
               </ListItem>
@@ -194,54 +216,149 @@ const CustomerPage: React.FC = () => {
           </List>
         )}
       </Paper>
-
-      {/* Dialogo para editar */}
-      <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
-        <DialogTitle>Editar Cliente</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1, minWidth: 350 }}>
-          <TextField
-            label="Nombre"
-            value={form.nombre}
-            onChange={e => setForm({ ...form, nombre: e.target.value })}
-            fullWidth
-            autoFocus
-          />
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ p: 2, pb: 0 }}>
+          {selected ? (
+            <Typography component="span" variant="h6" fontWeight={700} color="primary">
+              Editar Cliente
+            </Typography>
+          ) : (
+            <Typography component="span" variant="h6" fontWeight={700} color="primary">
+              Nuevo Cliente
+            </Typography>
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
+            <TextField
+              label="Nombre completo"
+              variant="outlined"
+              fullWidth
+              required
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Cédula/NIT"
+              variant="outlined"
+              fullWidth
+              value={form.cedula}
+              onChange={(e) => setForm({ ...form, cedula: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Teléfono"
+              variant="outlined"
+              fullWidth
+              value={form.telefono}
+              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Dirección"
+              variant="outlined"
+              fullWidth
+              value={form.direccion}
+              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Caracterización"
+              variant="outlined"
+              fullWidth
+              select
+              value={form.caracterizacion}
+              onChange={(e) => setForm({ ...form, caracterizacion: e.target.value as any })}
+              sx={{ mb: 2 }}
+            >
+              <MenuItem value="lista_1">Lista 1</MenuItem>
+              <MenuItem value="lista_2">Lista 2</MenuItem>
+              <MenuItem value="lista_3">Lista 3</MenuItem>
+            </TextField>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditOpen(false)}>Cancelar</Button>
-          <Button onClick={handleEditSave} variant="contained" color="primary">
-            Guardar
+          <Button onClick={() => setEditOpen(false)} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleEditSave} variant="contained" color="primary" disabled={loading}>
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Guardar cambios"}
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Dialogo para agregar */}
-      <Dialog open={addOpen} onClose={() => setAddOpen(false)}>
-        <DialogTitle>Nuevo Cliente</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1, minWidth: 350 }}>
-          <TextField
-            label="Nombre"
-            value={form.nombre}
-            onChange={e => setForm({ ...form, nombre: e.target.value })}
-            fullWidth
-            autoFocus
-          />
+      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ p: 2, pb: 0 }}>
+          <Typography component="span" variant="h6" fontWeight={700} color="primary">
+            Nuevo Cliente
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
+            <TextField
+              label="Nombre completo"
+              variant="outlined"
+              fullWidth
+              required
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Cédula/NIT"
+              variant="outlined"
+              fullWidth
+              value={form.cedula}
+              onChange={(e) => setForm({ ...form, cedula: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Teléfono"
+              variant="outlined"
+              fullWidth
+              value={form.telefono}
+              onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Dirección"
+              variant="outlined"
+              fullWidth
+              value={form.direccion}
+              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Caracterización"
+              variant="outlined"
+              fullWidth
+              select
+              value={form.caracterizacion}
+              onChange={(e) => setForm({ ...form, caracterizacion: e.target.value as any })}
+              sx={{ mb: 2 }}
+            >
+              <MenuItem value="lista_1">Lista 1</MenuItem>
+              <MenuItem value="lista_2">Lista 2</MenuItem>
+              <MenuItem value="lista_3">Lista 3</MenuItem>
+            </TextField>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAddOpen(false)}>Cancelar</Button>
-          <Button onClick={handleAdd} variant="contained" color="primary">
-            Guardar
+          <Button onClick={() => setAddOpen(false)} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleAdd} variant="contained" color="primary" disabled={loading}>
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Agregar Cliente"}
           </Button>
         </DialogActions>
       </Dialog>
-
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

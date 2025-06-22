@@ -5,12 +5,12 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import UpdateProduct from '../UpdateProduct';
 import Paginator from './Paginator'; // Import the Paginator component
 import ItemsPerPageSelector from './ItemsPerPageSelector'; // Import the ItemsPerPageSelector component
+import AddQuantityModal from './AddQuantityModal';
 
 export interface Product {
   id: number;
   nombre: string;
   valor_comercial: number;
-  valor_unitario: number;
   lista_1: number;
   lista_2: number;
   lista_3: number;
@@ -88,6 +88,8 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // State for items per page
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{id: number, nombre: string} | null>(null);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -102,6 +104,20 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleOpenAddModal = (product: Product) => {
+    setSelectedProduct({ id: product.id, nombre: product.nombre });
+    setAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleQuantityAdded = () => {
+    onUpdate();
+  };
 
   return (
     <div className="flex flex-col space-y-4 bg-gradient-to-br from-amber-50 to-gray-100 min-h-screen py-6">
@@ -129,7 +145,6 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
               </BusinessHeaderCell>
               <BusinessHeaderCell>Nombre</BusinessHeaderCell>
               <BusinessHeaderCell align="right">Valor Comercial</BusinessHeaderCell>
-              <BusinessHeaderCell align="right">Valor Unitario</BusinessHeaderCell>
               <BusinessHeaderCell align="right">Lista 1</BusinessHeaderCell>
               <BusinessHeaderCell align="right">Lista 2</BusinessHeaderCell>
               <BusinessHeaderCell align="right">Lista 3</BusinessHeaderCell>
@@ -152,14 +167,31 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
                 <TableCell sx={{ fontWeight: 500 }}>{product.id}</TableCell>
                 <TableCell>{product.nombre}</TableCell>
                 <TableCell>${product.valor_comercial.toLocaleString()}</TableCell>
-                <TableCell>${product.valor_unitario.toLocaleString()}</TableCell>
-                <TableCell>{product.lista_1}</TableCell>
-                <TableCell>{product.lista_2}</TableCell>
-                <TableCell>{product.lista_3}</TableCell>
+                <TableCell>{product.lista_1.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</TableCell>
+                <TableCell>{product.lista_2.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</TableCell>
+                <TableCell>{product.lista_3.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</TableCell>
                 <TableCell>{product.cantidad}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <UpdateProduct product={product} onUpdate={onUpdate} />
+                    <Button
+                      sx={{
+                        backgroundColor: '#1976d2',
+                        '&:hover': {
+                          backgroundColor: '#90caf9',
+                          color: '#1976d2',
+                          boxShadow: '0 2px 8px 0 rgba(25,118,210,0.15)',
+                        },
+                        fontWeight: 'bold',
+                        borderRadius: '8px',
+                        fontSize: '0.95rem',
+                        textTransform: 'none',
+                      }}
+                      variant="contained"
+                      onClick={() => handleOpenAddModal(product)}
+                    >
+                      SUMAR CANTIDAD
+                    </Button>
                     <Button
                       sx={{
                         backgroundColor: '#da0007',
@@ -198,6 +230,13 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
           onPageChange={handlePageChange}
         />
       </div>
+      <AddQuantityModal
+        open={addModalOpen}
+        onClose={handleCloseAddModal}
+        productId={selectedProduct?.id ?? null}
+        productName={selectedProduct?.nombre ?? ''}
+        onQuantityAdded={handleQuantityAdded}
+      />
     </div>
   );
 };

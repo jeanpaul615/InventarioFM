@@ -37,4 +37,9 @@ export class BillController {
   ) {
     return this.billService.updateProductQuantityInBill(billId, productId, quantity);
   }
+
+  @Patch(':billId/finalize')
+  async finalizeBill(@Param('billId') billId: number) {
+    return this.billService.finalizeBill(billId);
+  }
 }

@@ -16,7 +16,7 @@ export class CustomerService {
   }
 
   async findAll(): Promise<Customer[]> {
-    return this.customerRepository.find();
+    return this.customerRepository.find({ where: { activo: true } });
   }
 
   async findOne(id: number): Promise<Customer> {
@@ -37,9 +37,14 @@ export class CustomerService {
   }
 
   async remove(id: number): Promise<void> {
-    const result = await this.customerRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Customer with id ${id} not found`);
+    // Verifica si el cliente tiene facturas asociadas
+    const bills = await this.customerRepository.manager.find('Bill', { where: { customer: { id } } });
+    if (bills && bills.length > 0) {
+      // Si tiene facturas, solo lo marca como inactivo
+      await this.customerRepository.update(id, { activo: false });
+      return;
     }
+    // Si no tiene facturas, lo elimina físicamente
+    await this.customerRepository.delete(id);
   }
 }

@@ -19,6 +19,8 @@ import { useTheme } from "@mui/material/styles";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import QuantityModal from "./QuantityModal";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface InvoiceTableProps {
   groupedItems: (InventoryItem & { quantity: number })[];
@@ -293,34 +295,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   >
                     {item.name}
                   </TableCell>
-                  <TableCell sx={{ color: "#263238", textAlign: "center" }}>
-                    <TextField
-                      type="number"
-                      size="small"
-                      value={item.quantity}
-                      inputProps={{
-                        min: 1,
-                        style: {
-                          width: isMobile ? 50 : 60,
-                          textAlign: "center",
-                          fontSize: isMobile ? 12 : 14, // Ajuste de tamaño de letra
-                        },
-                      }}
-                      onChange={(e) =>
-                        onQuantityChange(item.id, Number(e.target.value))
-                      }
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          "&:hover fieldset": {
-                            borderColor: "#1565c0",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "#1565c0",
-                          },
-                        },
-                      }}
-                    />
+                  <TableCell sx={{ color: "#263238", textAlign: "center", fontWeight: 600, fontSize: isMobile ? 14 : 16, letterSpacing: 1 }}>
+                    {item.quantity}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -343,39 +319,49 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   </TableCell>
                   <TableCell className="no-print">
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       color="error"
                       size="small"
+                      startIcon={<DeleteIcon />}
                       onClick={() => onRemoveProduct(item.id)}
                       sx={{
                         borderRadius: 2,
                         textTransform: "none",
+                        fontWeight: 600,
                         fontSize: isMobile ? 12 : 14,
-                        "&:hover": {
-                          backgroundColor: "#f44336",
-                          color: "#fff",
+                        boxShadow: '0 2px 8px #f4433622',
+                        transition: 'background 0.2s',
+                        px: 1.5,
+                        '&:hover': {
+                          backgroundColor: '#d32f2f',
+                          color: '#fff',
                         },
                       }}
                     >
                       Eliminar
                     </Button>
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       color="primary"
                       size="small"
+                      startIcon={<EditIcon />}
                       onClick={() => handleOpenModal(item.id)}
                       sx={{
                         borderRadius: 2,
                         textTransform: "none",
+                        fontWeight: 600,
                         fontSize: isMobile ? 12 : 14,
                         ml: 1,
-                        "&:hover": {
-                          backgroundColor: "#1976d2",
-                          color: "#fff",
+                        boxShadow: '0 2px 8px #1976d222',
+                        transition: 'background 0.2s',
+                        px: 1.5,
+                        '&:hover': {
+                          backgroundColor: '#115293',
+                          color: '#fff',
                         },
                       }}
                     >
-                      Cambiar cantidad
+                      Editar cantidad
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -14,9 +14,12 @@ import {
 import ClearIcon from "@mui/icons-material/Clear";
 
 interface Customer {
-  id: number;
+  id?: number;
   nombre: string;
   caracterizacion: "lista_1" | "lista_2" | "lista_3";
+  cedula: string;
+  telefono: string;
+  direccion: string;
 }
 
 interface CustomerFormProps {
@@ -37,6 +40,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
   // Estados para crear cliente nuevo
   const [newName, setNewName] = useState("");
   const [newList, setNewList] = useState<Customer["caracterizacion"]>("lista_1");
+  const [newCedula, setNewCedula] = useState("");
+  const [newTelefono, setNewTelefono] = useState("");
+  const [newDireccion, setNewDireccion] = useState("");
   const [creating, setCreating] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -60,20 +66,29 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
 
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName) return;
+    if (!newName || !newCedula || !newTelefono || !newDireccion) return;
     setCreating(true);
     setSuccessMsg("");
     try {
       const res = await fetch("http://localhost:8000/customers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: newName, caracterizacion: newList }),
+        body: JSON.stringify({
+          nombre: newName,
+          caracterizacion: newList,
+          cedula: newCedula,
+          telefono: newTelefono,
+          direccion: newDireccion,
+        }),
       });
       const created = await res.json();
       setCustomers((prev) => [...prev, created]);
       setSelectedCustomerId(created.id);
       setNewName("");
       setNewList("lista_1");
+      setNewCedula("");
+      setNewTelefono("");
+      setNewDireccion("");
       setSuccessMsg("Cliente creado exitosamente.");
     } finally {
       setCreating(false);
@@ -131,6 +146,30 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
             size="small"
           />
           <TextField
+            label="Cédula o NIT"
+            value={newCedula}
+            onChange={(e) => setNewCedula(e.target.value)}
+            required
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Teléfono"
+            value={newTelefono}
+            onChange={(e) => setNewTelefono(e.target.value)}
+            required
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Dirección"
+            value={newDireccion}
+            onChange={(e) => setNewDireccion(e.target.value)}
+            required
+            fullWidth
+            size="small"
+          />
+          <TextField
             select
             label="Lista"
             value={newList}
@@ -147,7 +186,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={creating || !newName}
+            disabled={creating || !newName || !newCedula || !newTelefono || !newDireccion}
             sx={{ fontWeight: "bold", py: 1 }}
           >
             {creating ? <CircularProgress size={20} /> : "Crear"}

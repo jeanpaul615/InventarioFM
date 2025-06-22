@@ -20,7 +20,6 @@ interface UpdateProductProps {
     id: number;
     nombre: string;
     valor_comercial: number;
-    valor_unitario: number;
     lista_1: number;
     lista_2: number;
     lista_3: number;
@@ -44,7 +43,6 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
     let tempErrors: { [key: string]: string } = {};
     if (!form.nombre) tempErrors.nombre = 'El nombre es obligatorio.';
     if (form.valor_comercial <= 0) tempErrors.valor_comercial = 'Debe ser mayor a 0.';
-    if (form.valor_unitario <= 0) tempErrors.valor_unitario = 'Debe ser mayor a 0.';
     if (form.lista_1 < 0) tempErrors.lista_1 = 'No puede ser negativo.';
     if (form.lista_2 < 0) tempErrors.lista_2 = 'No puede ser negativo.';
     if (form.lista_3 < 0) tempErrors.lista_3 = 'No puede ser negativo.';
@@ -85,24 +83,37 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+            borderRadius: 6,
+            boxShadow: '0px 12px 40px 0px rgba(30,41,59,0.22)',
+            background: 'linear-gradient(135deg, #f0f4f8 70%, #e3f2fd 100%)',
+            border: '2px solid #90caf9',
+            p: 0.5,
+            minWidth: 420,
           },
         }}
       >
-        <DialogTitle>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6" fontWeight="bold">
-              Editar Producto
+        <DialogTitle sx={{
+          p: 0,
+          background: 'linear-gradient(90deg, #1976d2 60%, #64b5f6 100%)',
+          color: '#fff',
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          minHeight: 70,
+          display: 'flex',
+          alignItems: 'center',
+        }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" px={3} py={2}>
+            <Typography variant="h5" fontWeight={900} letterSpacing={1} sx={{ textShadow: '0 2px 8px #1565c055' }}>
+              ✏️ Editar Producto 
             </Typography>
-            <IconButton onClick={() => setOpen(false)}>
+            <IconButton onClick={() => setOpen(false)} sx={{ color: '#fff', bgcolor: '#1976d2', '&:hover': { bgcolor: '#1565c0' } }}>
               <Close />
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
-            <Grid container spacing={2}>
+        <DialogContent sx={{ p: 4, background: '#f8fafc', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+          <Box component="form" noValidate autoComplete="off" sx={{ mt: 1 }}>
+            <Grid container spacing={3}>
               <Grid item xs={12}>
                 <TextField
                   name="nombre"
@@ -112,6 +123,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   onChange={handleChange}
                   error={!!errors.nombre}
                   helperText={errors.nombre}
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -124,21 +136,10 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   onChange={handleChange}
                   error={!!errors.valor_comercial}
                   helperText={errors.valor_comercial}
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="valor_unitario"
-                  label="Valor Unitario"
-                  type="number"
-                  fullWidth
-                  value={form.valor_unitario}
-                  onChange={handleChange}
-                  error={!!errors.valor_unitario}
-                  helperText={errors.valor_unitario}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={2}>
                 <TextField
                   name="lista_1"
                   label="Lista 1"
@@ -148,9 +149,10 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   onChange={handleChange}
                   error={!!errors.lista_1}
                   helperText={errors.lista_1}
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={2}>
                 <TextField
                   name="lista_2"
                   label="Lista 2"
@@ -160,9 +162,10 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   onChange={handleChange}
                   error={!!errors.lista_2}
                   helperText={errors.lista_2}
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={2}>
                 <TextField
                   name="lista_3"
                   label="Lista 3"
@@ -172,9 +175,10 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   onChange={handleChange}
                   error={!!errors.lista_3}
                   helperText={errors.lista_3}
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   name="cantidad"
                   label="Cantidad"
@@ -184,17 +188,22 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   onChange={handleChange}
                   error={!!errors.cantidad}
                   helperText={errors.cantidad}
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
                 />
               </Grid>
             </Grid>
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 4, pb: 3, pt: 2, background: '#f0f4f8', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
           <Button
             onClick={() => setOpen(false)}
             sx={{
               color: '#f44336',
-              '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' },
+              fontWeight: 700,
+              borderRadius: 2,
+              px: 2.5,
+              fontSize: 16,
+              '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.08)' },
             }}
           >
             Cancelar
@@ -203,8 +212,14 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
             onClick={handleSubmit}
             variant="contained"
             sx={{
-              backgroundColor: '#4caf50',
-              '&:hover': { backgroundColor: '#388e3c' },
+              background: 'linear-gradient(90deg, #43a047 60%, #81c784 100%)',
+              fontWeight: 700,
+              borderRadius: 2,
+              px: 3,
+              fontSize: 16,
+              boxShadow: '0 2px 8px #43a04733',
+              letterSpacing: 1,
+              '&:hover': { background: 'linear-gradient(90deg, #388e3c 60%, #66bb6a 100%)' },
             }}
           >
             Guardar Cambios
