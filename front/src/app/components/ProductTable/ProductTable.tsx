@@ -11,8 +11,19 @@ import * as XLSX from 'xlsx';
 import Image from 'next/image';
 import { useApi } from '../../context/ApiContext';
 import { Product } from './ProductTableContent';
+import { useRouter } from 'next/navigation';
 
 const ProductTable: React.FC = () => {
+  const router = useRouter();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
+    }
+  }, [router]);
+
   const { baseUrl, token } = useApi(); // Obtener la URL base y el token desde el contexto
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');

@@ -24,6 +24,7 @@ import AddInventoryButton from "./AddInventoryButton";
 import PersonIcon from '@mui/icons-material/Person';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { useRouter } from 'next/navigation';
 
 interface InventoryLog {
   id: number;
@@ -42,6 +43,16 @@ const InventoryLogList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
+    }
+  }, [router]);
 
   useEffect(() => {
     if (!token) return;

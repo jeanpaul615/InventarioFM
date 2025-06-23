@@ -31,6 +31,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import axios from "axios";
 import { useApi } from "../context/ApiContext";
+import { useRouter } from 'next/navigation';
 
 interface Customer {
   id: number;
@@ -50,6 +51,7 @@ const CustomerPage: React.FC = () => {
   const [form, setForm] = useState({ nombre: "", cedula: "", telefono: "", direccion: "", caracterizacion: "lista_1" });
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
   const [addOpen, setAddOpen] = useState(false);
+  const router = useRouter();
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -67,6 +69,15 @@ const CustomerPage: React.FC = () => {
     fetchCustomers();
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
+    }
+  }, [router]);
 
   const handleEdit = (customer: Customer) => {
     setSelected(customer);

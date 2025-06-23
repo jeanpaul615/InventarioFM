@@ -13,7 +13,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { InventoryItem } from "./InventoryItem";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from "@mui/material/styles";
 import jsPDF from "jspdf";
@@ -21,6 +21,7 @@ import html2canvas from "html2canvas";
 import QuantityModal from "./QuantityModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { useRouter } from 'next/navigation';
 
 interface InvoiceTableProps {
   groupedItems: (InventoryItem & { quantity: number, billProductId?: number })[];
@@ -43,6 +44,16 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
+    }
+  }, [router]);
 
   const onQuantityChange = async (productId: number, newQuantity: number) => {
     if (newQuantity < 1) return;

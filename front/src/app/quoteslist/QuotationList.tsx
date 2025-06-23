@@ -70,6 +70,16 @@ const QuotationList: React.FC = () => {
       .catch(() => setQuotations([]));
   }, [token]);
 
+  // Redirige al login si no hay token
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
+    }
+  }, [router]);
+
   // Calcula el total de una cotización
   const getTotal = (quotation: Quotation) =>
     quotation.quotationProducts.reduce((acc, qp) => acc + qp.price * qp.quantity, 0);

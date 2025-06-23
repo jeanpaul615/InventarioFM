@@ -174,6 +174,7 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
                 <TableCell>
                   <div className="flex space-x-2">
                     <UpdateProduct product={product} onUpdate={onUpdate} />
+
                     <Button
                       sx={{
                         backgroundColor: '#da0007',

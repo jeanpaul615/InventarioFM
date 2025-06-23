@@ -64,7 +64,11 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Redirigir al login si no hay usuario autenticado
+    if (mounted && !user) {
+      router.push('/login');
+    }
+  }, [mounted, user, router]);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
