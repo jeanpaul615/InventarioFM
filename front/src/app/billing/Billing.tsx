@@ -23,19 +23,37 @@ const mockInventory: InventoryItem[] = [
 
 const Billing: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<
-    { item: InventoryItem; quantity: number }[]
+    { item: InventoryItem & { billProductId?: number }; quantity: number }[]
   >([]);
   const [total, setTotal] = useState(0);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [products, setProducts] = useState<InventoryItem[]>(mockInventory);
   const [customerName, setCustomerName] = useState("");
   const [currentBillId, setCurrentBillId] = useState<number | null>(null);
+  const [customerData, setCustomerData] = useState({
+    nombre: '',
+    cedula: '',
+    direccion: '',
+    telefono: ''
+  });
 
+  // Al montar, busca el customer_id y carga los datos del cliente
   useEffect(() => {
     const stored = localStorage.getItem("currentBillId");
     if (stored) setCurrentBillId(Number(stored));
-    const storedCustomerName = localStorage.getItem("customerName");
-    if (storedCustomerName) setCustomerName(storedCustomerName);
+    const storedCustomerId = localStorage.getItem("customer_id");
+    if (storedCustomerId) {
+      fetch(`http://localhost:8000/customers/${storedCustomerId}`)
+        .then(res => res.json())
+        .then(data => {
+          setCustomerData({
+            nombre: data.nombre || '',
+            cedula: data.cedula || '',
+            direccion: data.direccion || '',
+            telefono: data.telefono || ''
+          });
+        });
+    }
   }, []);
 
   const [alert, setAlert] = useState<{ open: boolean; message: string; severity?: "success" | "error" | "info" | "warning" }>({
@@ -181,6 +199,7 @@ const Billing: React.FC = () => {
               name: bp.product?.nombre ?? "Producto SIN NOMBRE",
               price: bp.price ?? bp.product?.price ?? 0,
               stock: bp.product?.stock ?? 0,
+              billProductId: bp.id, // <-- agrega el id de la relación
             },
             quantity: bp.quantity,
           }));
@@ -212,23 +231,35 @@ const Billing: React.FC = () => {
 
     // Recupera la lista seleccionada (o usa una por defecto)
     const lista = localStorage.getItem("customer_lista") || "lista_1";
+    const customerId = localStorage.getItem("customer_id");
 
-    // 1. Crear el cliente y obtener su ID
-    const customerResponse = await fetch("http://localhost:8000/customers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nombre: name,
-        caracterizacion: lista,
-      }),
-    });
+    let customer = null;
 
-    if (!customerResponse.ok) {
-      showAlert("Error al crear el cliente", "error");
-      return;
+    if (customerId) {
+      // Si ya hay un customer_id, usa ese cliente existente
+      const res = await fetch(`http://localhost:8000/customers/${customerId}`);
+      if (!res.ok) {
+        showAlert("No se pudo obtener el cliente existente", "error");
+        return;
+      }
+      customer = await res.json();
+    } else {
+      // Si no hay customer_id, crea el cliente
+      const customerResponse = await fetch("http://localhost:8000/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: name,
+          caracterizacion: lista,
+        }),
+      });
+      if (!customerResponse.ok) {
+        showAlert("Error al crear el cliente", "error");
+        return;
+      }
+      customer = await customerResponse.json();
+      localStorage.setItem("customer_id", customer.id?.toString() || '');
     }
-
-    const customer = await customerResponse.json();
 
     // 2. Crear la factura usando el ID del cliente
     const billResponse = await fetch("http://localhost:8000/bills", {
@@ -287,10 +318,9 @@ const Billing: React.FC = () => {
     }, {} as Record<number, InventoryItem & { quantity: number }>)
   );
 
-  const handleRemoveProduct = async (productId: number) => {
-    if (!currentBillId) return;
+  const handleRemoveProduct = async (billProductId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/bills/${currentBillId}/products/${productId}`, {
+      const response = await fetch(`http://localhost:8000/bill-products/${billProductId}`, {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -298,12 +328,32 @@ const Billing: React.FC = () => {
         showAlert(errorData.message || "No se pudo eliminar el producto", "error");
         return;
       }
-      setSelectedItems(selectedItems.filter(({ item }) => item.id !== productId));
       showAlert("Producto eliminado de la factura", "success");
-      const newTotal = selectedItems
-        .filter(({ item }) => item.id !== productId)
-        .reduce((acc, curr) => acc + curr.item.price * curr.quantity, 0);
-      setTotal(newTotal);
+      // Recarga la factura para reflejar el cambio
+      if (currentBillId) {
+        const res = await fetch(`http://localhost:8000/bills/${currentBillId}`);
+        if (res.ok) {
+          const bill = await res.json();
+          if (Array.isArray(bill.billProducts)) {
+            const items = bill.billProducts.map((bp: any) => ({
+              item: {
+                id: bp.product?.id ?? bp.id,
+                name: bp.product?.nombre ?? "Producto SIN NOMBRE",
+                price: bp.price ?? bp.product?.price ?? 0,
+                stock: bp.product?.stock ?? 0,
+                billProductId: bp.id,
+              },
+              quantity: bp.quantity,
+            }));
+            setSelectedItems(items);
+            const totalFactura = items.reduce(
+              (acc: number, curr: any) => acc + curr.item.price * curr.quantity,
+              0
+            );
+            setTotal(totalFactura);
+          }
+        }
+      }
     } catch (error: any) {
       showAlert(error?.message || "Error al eliminar el producto", "error");
     }
@@ -363,7 +413,19 @@ const Billing: React.FC = () => {
         onDownloadPDF={handleGeneratePDF}
         onSyncStock={handleSyncStockAndBill}
       />
-      <CustomerForm onSubmit={(customer) => handleCreateBill(customer.nombre)} />
+      <CustomerForm onSubmit={(customer) => {
+        setCustomerData({
+          nombre: customer.nombre,
+          cedula: customer.cedula,
+          direccion: customer.direccion,
+          telefono: customer.telefono
+        });
+        localStorage.setItem("customer_id", customer.id?.toString() || '');
+        localStorage.setItem("customer_cedula", customer.cedula || '');
+        localStorage.setItem("customer_direccion", customer.direccion || '');
+        localStorage.setItem("customer_telefono", customer.telefono || '');
+        handleCreateBill(customer.nombre);
+      }} />
       <Box
         id="invoice"
         sx={{
@@ -382,12 +444,7 @@ const Billing: React.FC = () => {
       >
         <InvoiceHeader
           currentBillId={currentBillId}
-          customer={{
-            nombre: customerName,
-            cedula: "1234567890", // Puedes obtener estos datos reales de tu backend/formulario
-            direccion: "Cra 10 #20-30",
-            telefono: "+57 300 123 4567"
-          }}
+          customer={customerData}
         />
         <Divider sx={{ mb: 2 }} />
       <InvoiceTable

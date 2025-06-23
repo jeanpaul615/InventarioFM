@@ -59,7 +59,8 @@ export class BillService {
       relations: ['bill', 'product'],
     });
     if (!billProduct) {
-      throw new Error('Producto no encontrado en la factura');
+      // No lanzar error, solo responder con mensaje
+      return { message: 'Producto no encontrado en la factura', notFound: true };
     }
     await this.billProductRepository.remove(billProduct);
     return { message: 'Producto eliminado de la factura' };

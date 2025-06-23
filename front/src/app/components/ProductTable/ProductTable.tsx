@@ -13,7 +13,7 @@ import { useApi } from '../../context/ApiContext';
 import { Product } from './ProductTableContent';
 
 const ProductTable: React.FC = () => {
-  const { baseUrl } = useApi(); // Obtener la URL base desde el contexto
+  const { baseUrl, token } = useApi(); // Obtener la URL base y el token desde el contexto
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -25,15 +25,26 @@ const ProductTable: React.FC = () => {
   }, []);
 
   const fetchProducts = async () => {
-    const response = await axios.get(`${baseUrl}/products`);
-    // Si la respuesta es paginada, usa response.data.items
-    const data = response.data;
-    if (Array.isArray(data)) {
-      setProducts(data);
-    } else if (Array.isArray(data.items)) {
-      setProducts(data.items);
-    } else {
-      setProducts([]);
+    try {
+      const response = await axios.get(`${baseUrl}/products`);
+      const data = response.data;
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else if (Array.isArray(data.items)) {
+        setProducts(data.items);
+      } else {
+        setProducts([]);
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        setSnackbarMessage('No autorizado. Por favor, inicia sesión de nuevo.');
+        setSnackbarOpen(true);
+        setProducts([]);
+      } else {
+        setSnackbarMessage('Error al cargar productos.');
+        setSnackbarOpen(true);
+        setProducts([]);
+      }
     }
   };
 

@@ -22,4 +22,8 @@ export class BillProductService {
   findOne(id: number) {
     return this.billProductRepository.findOne({ where: { id }, relations: ['bill', 'product'] });
   }
+
+  async remove(id: number) {
+    return this.billProductRepository.delete(id);
+  }
 }

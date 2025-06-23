@@ -23,7 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
 interface InvoiceTableProps {
-  groupedItems: (InventoryItem & { quantity: number })[];
+  groupedItems: (InventoryItem & { quantity: number, billProductId?: number })[];
   handleQuantityChange: (productId: number, newQuantity: number) => void;
   handleRemoveProduct: (productId: number) => void;
   billId: number;
@@ -46,13 +46,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
 
   const onQuantityChange = async (productId: number, newQuantity: number) => {
     if (newQuantity < 1) return;
-    handleQuantityChange(productId, newQuantity);
-    const updatedTotal = groupedItems.reduce((acc, item) => {
-      return item.id === productId
-        ? acc + item.price * newQuantity
-        : acc + item.price * item.quantity;
-    }, 0);
-    updateTotal(updatedTotal);
+    // Primero actualiza el estado local antes de calcular el total
+    await handleQuantityChange(productId, newQuantity);
+    // Calcula el total usando el nuevo estado (no el groupedItems anterior)
+    // Opcional: puedes pedirle al padre que recalcule el total, o forzar un refetch
     try {
       const response = await axios.patch(
         `http://localhost:8000/bills/${billId}/products/${productId}/quantity`,
@@ -66,14 +63,18 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     }
   };
 
-  const onRemoveProduct = async (productId: number) => {
-    await handleRemoveProduct(productId);
-    const updatedItems = groupedItems.filter((item) => item.id !== productId);
-    const updatedTotal = updatedItems.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
-    updateTotal(updatedTotal);
+  const onRemoveProduct = async (productId: number, billProductId?: number) => {
+    try {
+      if (billProductId) {
+        await axios.delete(`http://localhost:8000/bill-products/${billProductId}`);
+      } else {
+        await axios.delete(`http://localhost:8000/bills/${billId}/products/${productId}`);
+      }
+      await handleRemoveProduct(productId);
+      console.log("Producto eliminado completamente de la base de datos y del estado local");
+    } catch (error) {
+      console.error("Error al eliminar el producto de la base de datos:", error);
+    }
   };
 
   const handleGeneratePDF = async () => {
@@ -323,7 +324,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       color="error"
                       size="small"
                       startIcon={<DeleteIcon />}
-                      onClick={() => onRemoveProduct(item.id)}
+                      onClick={() => onRemoveProduct(item.id, item.billProductId)}
                       sx={{
                         borderRadius: 2,
                         textTransform: "none",

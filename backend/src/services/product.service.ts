@@ -32,6 +32,7 @@ export class ProductService {
         createdProduct.nombre,
         createdProduct.cantidad,
         userId,
+        'nuevo' // tipo: producto nuevo
       );
     }
     return createdProduct;
@@ -50,6 +51,7 @@ export class ProductService {
         updatedProduct.nombre,
         updatedProduct.cantidad - before.cantidad,
         userId,
+        'suma' // tipo: suma al inventario
       );
     }
     return updatedProduct;
@@ -60,7 +62,7 @@ export class ProductService {
     await this.productRepository.update(id, { activo: false });
   }
 
-  async bulkCreate(products: any[]): Promise<void> {
+  async bulkCreate(products: any[], userId?: number): Promise<void> {
     try {
       const productEntities = products.map((row) => {
         const product = new Product();
@@ -72,9 +74,19 @@ export class ProductService {
         product.cantidad = row.cantidad;
         return product;
       });
-
-      await this.productRepository.save(productEntities);
-      console.log('Productos guardados:', productEntities.length);
+      const savedProducts = await this.productRepository.save(productEntities);
+      // Registrar en inventory-log cada producto nuevo
+      if (userId) {
+        for (const p of savedProducts) {
+          await this.inventoryLogService.logIngreso(
+            p.nombre,
+            p.cantidad,
+            userId,
+            'nuevo'
+          );
+        }
+      }
+      console.log('Productos guardados:', savedProducts.length);
     } catch (error) {
       console.error('Error al guardar productos:', error);
       throw error;

@@ -60,7 +60,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
     if (!customer) return;
     // Guardar la lista en localStorage
     localStorage.setItem("customer_lista", customer.caracterizacion);
-    onSubmit(customer);
+    localStorage.setItem("customer_id", customer.id?.toString() || "");
+    onSubmit({
+      id: customer.id,
+      nombre: customer.nombre,
+      caracterizacion: customer.caracterizacion,
+      cedula: customer.cedula,
+      telefono: customer.telefono,
+      direccion: customer.direccion
+    });
     setSelectedCustomerId("");
   };
 

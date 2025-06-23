@@ -73,8 +73,14 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
     setLoading(true);
     try {
       const response = await axios.get(`${baseUrl}/products`);
-      setProducts(response.data);
-      setFiltered(response.data);
+      const data = response.data;
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else if (Array.isArray(data.items)) {
+        setProducts(data.items);
+      } else {
+        setProducts([]);
+      }
     } catch (error) {
       setProducts([]);
       setFiltered([]);

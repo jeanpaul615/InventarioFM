@@ -176,24 +176,6 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
                     <UpdateProduct product={product} onUpdate={onUpdate} />
                     <Button
                       sx={{
-                        backgroundColor: '#1976d2',
-                        '&:hover': {
-                          backgroundColor: '#90caf9',
-                          color: '#1976d2',
-                          boxShadow: '0 2px 8px 0 rgba(25,118,210,0.15)',
-                        },
-                        fontWeight: 'bold',
-                        borderRadius: '8px',
-                        fontSize: '0.95rem',
-                        textTransform: 'none',
-                      }}
-                      variant="contained"
-                      onClick={() => handleOpenAddModal(product)}
-                    >
-                      SUMAR CANTIDAD
-                    </Button>
-                    <Button
-                      sx={{
                         backgroundColor: '#da0007',
                         '&:hover': {
                           backgroundColor: '#ffd6d6',

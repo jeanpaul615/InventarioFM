@@ -19,7 +19,7 @@ interface AddProductProps {
 }
 
 const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
-  const { baseUrl } = useApi(); // Obtener la URL base desde el contexto
+  const { baseUrl, token } = useApi(); // Obtener la URL base y el token desde el contexto
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     nombre: '',
@@ -53,7 +53,9 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
     if (!validate()) return;
 
     try {
-      await axios.post(`${baseUrl}/products`, form);
+      await axios.post(`${baseUrl}/products`, form, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       setOpen(false);
       onAdd();
       setForm({

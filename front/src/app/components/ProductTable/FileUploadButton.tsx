@@ -19,7 +19,7 @@ interface FileUploadModalProps {
 }
 
 const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
-  const { baseUrl } = useApi(); // Obtener la URL base desde el contexto
+  const { baseUrl, token } = useApi(); // Obtener la URL base y el token desde el contexto
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -41,6 +41,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
       const response = await fetch(`${baseUrl}/products/upload`, {
         method: 'POST',
         body: formData,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
 
       // Procesar respuesta del backend

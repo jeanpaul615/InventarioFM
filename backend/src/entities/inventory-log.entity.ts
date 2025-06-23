@@ -15,6 +15,9 @@ export class InventoryLog {
   @Column('int')
   cantidad: number;
 
-  @ManyToOne(() => User)
+  @Column({ type: 'varchar', default: 'suma' })
+  tipo: 'nuevo' | 'suma'; // 'nuevo' para producto nuevo, 'suma' para suma al inventario
+
+  @ManyToOne(() => User, { eager: true })
   usuario: User;
 }

@@ -10,7 +10,12 @@ interface QuantityModalProps {
 const QuantityModal: React.FC<QuantityModalProps> = ({ open, onClose, onSubmit }) => {
   const [quantity, setQuantity] = useState<number>(1);
 
+  React.useEffect(() => {
+    if (open) setQuantity(0); // Reset quantity when modal opens
+  }, [open]);
+
   const handleSubmit = () => {
+    if (quantity < 1 || isNaN(quantity)) return; // Prevent invalid values
     onSubmit(quantity);
     onClose();
   };
@@ -25,7 +30,7 @@ const QuantityModal: React.FC<QuantityModalProps> = ({ open, onClose, onSubmit }
           transform: "translate(-50%, -50%)",
           width: 300,
           bgcolor: "background.paper",
-          boxShadow: 24,
+          boxShadow: 24, 
           p: 4,
           borderRadius: 2,
         }}

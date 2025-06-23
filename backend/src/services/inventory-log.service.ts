@@ -13,10 +13,15 @@ export class InventoryLogService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  async logIngreso(material: string, cantidad: number, userId: number) {
+  async logIngreso(
+    material: string,
+    cantidad: number,
+    userId: number,
+    tipo: 'nuevo' | 'suma' = 'suma',
+  ) {
     const usuario = await this.userRepo.findOneBy({ id: userId });
     if (!usuario) throw new Error('Usuario no encontrado');
-    const log = this.logRepo.create({ material, cantidad, usuario });
+    const log = this.logRepo.create({ material, cantidad, usuario, tipo });
     return this.logRepo.save(log);
   }
 
