@@ -1,16 +1,27 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Box, Divider, Button, Typography } from "@mui/material";
-import AddProductModal from "../billing/AddProductModal";
+import AddProductModalQuotation from "./AddProductModalQuotation";
 import CustomerForm from "../billing/CustomerForm";
 import AlertSnackbar from "../billing/AlertSnackbar";
 import ConfirmDialog from "../billing/ConfirmDialog";
 import QuotationHeader from "./QuotationHeader";
 import QuotationFooter from "./QuotationFooter";
 import QuotationTable from "./QuotationTable";
-import { InventoryItem } from "../billing/Billing/InventoryItem";
+import InvoiceTotals from "./InvoiceTotals";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+
+// Tipo específico para cotización
+interface InventoryItem {
+  id: number;
+  nombre: string;
+  cantidad: number;
+  price?: number;
+  lista_1?: number;
+  lista_2?: number;
+  lista_3?: number;
+}
 
 const Quotation: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<
@@ -28,13 +39,18 @@ const Quotation: React.FC = () => {
   };
 
   const handleAddItem = (item: InventoryItem, quantity: number) => {
-    const existingItem = selectedItems.find((i) => i.item.id === item.id);
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      setSelectedItems([...selectedItems, { item, quantity }]);
-    }
-    setTotal(total + item.price * quantity);
+    // Si el producto tiene listas de precio, toma la primera disponible
+    const price = typeof item.price === 'number' ? item.price : (item.lista_1 ?? item.lista_2 ?? item.lista_3 ?? 0);
+    setSelectedItems((prev) => {
+      const existing = prev.find((i) => i.item.id === item.id);
+      if (existing) {
+        return prev.map((i) =>
+          i.item.id === item.id ? { ...i, quantity: i.quantity + quantity, item: { ...i.item, price } } : i
+        );
+      } else {
+        return [...prev, { item: { ...item, price }, quantity }];
+      }
+    });
     showAlert("Producto agregado a la cotización", "success");
   };
 
@@ -51,7 +67,7 @@ const Quotation: React.FC = () => {
     setSelectedItems(selectedItems.filter(({ item }) => item.id !== productId));
     const newTotal = selectedItems
       .filter(({ item }) => item.id !== productId)
-      .reduce((acc, curr) => acc + curr.item.price * curr.quantity, 0);
+      .reduce((acc, curr) => acc + ((curr.item.price ?? 0) * curr.quantity), 0);
     setTotal(newTotal);
   };
 
@@ -70,9 +86,8 @@ const Quotation: React.FC = () => {
   useEffect(() => {
     const saved = localStorage.getItem("ferremolina-quotation");
     if (saved) {
-      const { selectedItems, total, customer, quotationId, isFinalized } = JSON.parse(saved);
+      const { selectedItems, customer, quotationId, isFinalized } = JSON.parse(saved);
       setSelectedItems(selectedItems || []);
-      setTotal(total || 0);
       setCustomer(customer || null);
       setQuotationId(quotationId || null);
       setIsFinalized(isFinalized || false);
@@ -83,9 +98,15 @@ const Quotation: React.FC = () => {
   useEffect(() => {
     localStorage.setItem(
       "ferremolina-quotation",
-      JSON.stringify({ selectedItems, total, customer, quotationId, isFinalized })
+      JSON.stringify({ selectedItems, customer, quotationId, isFinalized })
     );
-  }, [selectedItems, total, customer, quotationId, isFinalized]);
+  }, [selectedItems, customer, quotationId, isFinalized]);
+
+  // Calcular el total correctamente cada vez que cambian los productos
+  useEffect(() => {
+    const newTotal = selectedItems.reduce((acc, curr) => acc + ((curr.item.price ?? 0) * curr.quantity), 0);
+    setTotal(newTotal);
+  }, [selectedItems]);
 
   const handleSaveQuotation = async () => {
     if (!customer || !customer.id) {
@@ -221,11 +242,10 @@ const Quotation: React.FC = () => {
         sx={{ mb: 2, fontWeight: 700, borderRadius: 2, px: 4, py: 1.2, borderWidth: 2, borderColor: '#1976d2' }}
         onClick={() => setIsAddModalOpen(true)}
         startIcon={<span style={{ fontWeight: 900, fontSize: 22 }}>+</span>}
-        disabled={isFinalized}
       >
         Agregar Producto
       </Button>
-      <CustomerForm onSubmit={(customer) => setCustomer(customer)} disabled={isFinalized} />
+      <CustomerForm onSubmit={(customer) => setCustomer(customer)}  />
       <Box
         id="quotation-invoice"
         sx={{
@@ -251,11 +271,17 @@ const Quotation: React.FC = () => {
         />
         <Divider sx={{ mb: 2, borderColor: "#ff6600" }} />
         <QuotationTable
-          groupedItems={groupedItems}
+          groupedItems={groupedItems.map((item) => ({
+            id: item.id,
+            name: item.nombre, // Usar nombre para la tabla
+            price: item.price ?? 0,
+            quantity: item.quantity ?? 0,
+          }))}
           handleQuantityChange={handleQuantityChange}
           handleRemoveProduct={handleRemoveProduct}
           editable={!isFinalized}
         />
+        <InvoiceTotals total={total} />
         <Divider sx={{ my: 2, borderColor: "#ff6600" }} />
         <QuotationFooter />
       </Box>
@@ -293,11 +319,10 @@ const Quotation: React.FC = () => {
         severity={alert.severity as any}
         onClose={() => setAlert({ ...alert, open: false })}
       />
-      <AddProductModal
+      <AddProductModalQuotation
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddItem}
-        billId={null}
       />
       {/* Puedes agregar ConfirmDialog si lo necesitas */}
     </Box>

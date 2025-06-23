@@ -26,7 +26,7 @@ const ProductTable: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/products`);
+      const response = await axios.get(`${baseUrl}/products?limit=100000`);
       const data = response.data;
       if (Array.isArray(data)) {
         setProducts(data);

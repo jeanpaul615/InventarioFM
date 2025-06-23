@@ -14,10 +14,10 @@ const QuotationFooter = () => (
       ¡Gracias por confiar en Ferremolina!
     </Typography>
     <Typography variant="body2" sx={{ mt: 0.5 }}>
-      Esta cotización es informativa y no constituye un documento fiscal.
+      Cotización sujeta a cambios sin previo aviso.
     </Typography>
     <Typography variant="body2" sx={{ mt: 0.5 }}>
-      Para pedidos o dudas, contáctanos: 320 000 0000
+      Disponibilidad sujeta a existencias en el momento de la compra.
     </Typography>
   </Box>
 );

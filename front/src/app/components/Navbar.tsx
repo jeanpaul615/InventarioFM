@@ -30,14 +30,20 @@ import { useRouter } from 'next/navigation'
 import { styled } from '@mui/system';
 import { useApi } from '../context/ApiContext';
 
-const NAVIGATION = [
-  { title: 'Inventario', icon: <HomeIcon />, path: '/' },
-  { title: 'Facturacion', icon: <InfoIcon />, path: '/billing' },
-  { title: 'Clientes', icon: <ContactMailIcon />, path: '/customer' },
+const NAVIGATION_BILLING = [
+  { title: 'Facturación', icon: <InfoIcon />, path: '/billing' },
   { title: 'Registro de Facturas', icon: <LoginIcon />, path: '/billinglist' },
-  { title: 'Cotización', icon: <AssignmentIcon />, path: '/quotation' },
-  { title: 'Registro de Cotizaciones', icon: <DashboardIcon />, path: '/quoteslist' },
-  { title: 'Ingresos Inventario', icon: <AssignmentIcon />, path: '/inventorylog/list' },
+];
+const NAVIGATION_QUOTATION = [
+  { title: 'Cotización', icon: <AssignmentIcon sx={{ color: '#1976d2' }} />, path: '/quotation' },
+  { title: 'Registro de Cotizaciones', icon: <DashboardIcon sx={{ color: '#1976d2' }} />, path: '/quoteslist' },
+];
+const NAVIGATION_INVENTORY = [
+  { title: 'Inventario', icon: <HomeIcon sx={{ color: '#43a047' }} />, path: '/' },
+  { title: 'Ingresos Inventario', icon: <AssignmentIcon sx={{ color: '#43a047' }} />, path: '/inventorylog/list' },
+];
+const NAVIGATION_CLIENTS = [
+  { title: 'Clientes', icon: <ContactMailIcon sx={{ color: '#ff9800' }} />, path: '/customer' },
 ];
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
@@ -79,13 +85,17 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ background: 'linear-gradient(to right, #ff9800, #ff5722)' }}>
+      <AppBar position="fixed" sx={{ background: 'linear-gradient(90deg, #232526 0%, #414345 100%)', boxShadow: '0 4px 24px #0008' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen} sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
-          <h1 className="pt-7 text-3xl font-bold text-amber-400 mb-6 text-center">INVENTARIO FERREMOLINA</h1>
-          <Box sx={{ flex: 1 }} />
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src="/logo.webp" alt="Logo" style={{ height: 48, marginRight: 16, borderRadius: 8, boxShadow: '0 2px 8px #ff9800' }} />
+            <Typography variant="h5" fontWeight={900} sx={{ color: '#ff9800', letterSpacing: 2, textShadow: '0 2px 8px #0006' }}>
+              INVENTARIO FERREMOLINA
+            </Typography>
+          </Box>
           {user ? (
             <>
               <Typography sx={{ color: '#fff', fontWeight: 700, mr: 2 }}>
@@ -124,56 +134,43 @@ const Navbar: React.FC = () => {
       </AppBar>
       <StyledDrawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>
         <Toolbar />
-        <Divider sx={{ backgroundColor: 'rgba(224, 224, 224, 0.2)' }} /> {/* Divider gris claro */}
-        <List>
-          {NAVIGATION.map((item) => (
-            <ListItem
-              key={item.title}
-              onClick={() => handleNavigation(item.path)}
-              sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255, 0.8)', // Naranja más brillante al hacer hover
-                transform: 'scale(1.05)', // Efecto de zoom
-                color: '#000000', // Texto blanco al hacer hover
-              
-              },
-              '&:active': {
-                transform: 'scale(0.98)', // Efecto de clic
-                backgroundColor: 'rgba(255, 87, 34, 0.9)', // Naranja más oscuro al hacer clic
-              },
-              color: '#ffffff', // Texto blanco
-              }}
-            >
-                <ListItemIcon
-                sx={{
-                  color: '#ff8300',
-                  '&:hover': {
-                  color: '#ffffff', // Cambia el color del icono a blanco al hacer hover
-                  },
-                }}
-                >
-                {item.icon}
-                </ListItemIcon>
-              <ListItemText
-              primary={item.title}
-              primaryTypographyProps={{
-                fontWeight: 'bold',
-                fontSize: '1rem',
-              }}
-              />
+        <Divider sx={{ backgroundColor: 'rgba(224, 224, 224, 0.2)' }} />
+        <List subheader={<Typography sx={{ pl: 2, pt: 1, color: '#ff9800', fontWeight: 700 }}>Inventario</Typography>}>
+          {NAVIGATION_INVENTORY.map((item) => (
+            <ListItem component="button" key={item.title} onClick={() => handleNavigation(item.path)} sx={{ ...navItemSx }}>
+              <ListItemIcon sx={{ ...iconSx }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.title} primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1rem' }} />
             </ListItem>
           ))}
         </List>
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            textAlign: 'center',
-            py: 2,
-            background: 'rgba(44, 62, 80, 0.1)', // Fondo azul oscuro translúcido
-          }}
-        >
+        <Divider />
+        <List subheader={<Typography sx={{ pl: 2, pt: 1, color: '#1976d2', fontWeight: 700 }}>Cotización</Typography>}>
+          {NAVIGATION_QUOTATION.map((item) => (
+            <ListItem component="button" key={item.title} onClick={() => handleNavigation(item.path)} sx={{ ...navItemSx }}>
+              <ListItemIcon sx={{ ...iconSx }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.title} primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1rem' }} />
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List subheader={<Typography sx={{ pl: 2, pt: 1, color: '#ff5722', fontWeight: 700 }}>Facturación</Typography>}>
+          {NAVIGATION_BILLING.map((item) => (
+            <ListItem component="button" key={item.title} onClick={() => handleNavigation(item.path)} sx={{ ...navItemSx }}>
+              <ListItemIcon sx={{ ...iconSx }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.title} primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1rem' }} />
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List subheader={<Typography sx={{ pl: 2, pt: 1, color: '#ff9800', fontWeight: 700 }}>Clientes</Typography>}>
+          {NAVIGATION_CLIENTS.map((item) => (
+            <ListItem component="button" key={item.title} onClick={() => handleNavigation(item.path)} sx={{ ...navItemSx }}>
+              <ListItemIcon sx={{ ...iconSx }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.title} primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1rem' }} />
+            </ListItem>
+          ))}
+        </List>
+        <Box sx={{ position: 'absolute', bottom: 0, width: '100%', textAlign: 'center', py: 2, background: 'rgba(44, 62, 80, 0.1)' }}>
           <Typography variant="body2" sx={{ color: '#e0e0e0', fontSize: '0.9rem' }}>
             © 2025 Ferremolina. Todos los derechos reservados.
           </Typography>
@@ -184,3 +181,26 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+
+// Estilos para los ítems
+const navItemSx = {
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255, 0.08)',
+    transform: 'scale(1.04)',
+    color: '#ff9800',
+  },
+  '&:active': {
+    transform: 'scale(0.98)',
+    backgroundColor: 'rgba(255, 152, 0, 0.2)',
+  },
+  color: '#fff',
+  borderRadius: 2,
+  mx: 1,
+  my: 0.5,
+  transition: 'all 0.2s',
+};
+const iconSx = {
+  minWidth: 36,
+  color: '#ff9800',
+  fontSize: 24,
+};

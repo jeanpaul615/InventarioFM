@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 interface Item {
   id: number;
-  name: string;
+  name: string; // para cotización, será el campo 'nombre'
   price: number;
   quantity: number;
 }
@@ -24,7 +24,7 @@ const QuotationTable: React.FC<QuotationTableProps> = ({ groupedItems, handleQua
           <TableCell sx={{ color: "#ff6600", fontWeight: 800, fontSize: 16, borderBottom: "2.5px solid #ffb74d", letterSpacing: 1, textAlign: "center" }}>Cantidad</TableCell>
           <TableCell sx={{ color: "#ff6600", fontWeight: 800, fontSize: 16, borderBottom: "2.5px solid #ffb74d", letterSpacing: 1, textAlign: "center" }}>Precio Unitario</TableCell>
           <TableCell sx={{ color: "#ff6600", fontWeight: 800, fontSize: 16, borderBottom: "2.5px solid #ffb74d", letterSpacing: 1, textAlign: "center" }}>Subtotal</TableCell>
-          {editable && <TableCell />}
+          {editable && <TableCell className="no-print" />} {/* Solo mostrar en pantalla */}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -48,13 +48,13 @@ const QuotationTable: React.FC<QuotationTableProps> = ({ groupedItems, handleQua
               <TableCell sx={{ color: "#263238", fontWeight: 500, textAlign: "center" }}>{item.name}</TableCell>
               <TableCell sx={{ color: "#263238", textAlign: "center" }}>{item.quantity}</TableCell>
               <TableCell sx={{ color: "#263238", textAlign: "center" }}>
-                ${item.price.toLocaleString()}
+                {typeof item.price === "number" ? `$${item.price.toLocaleString()}` : "$0"}
               </TableCell>
               <TableCell sx={{ color: "#1565c0", fontWeight: 700, textAlign: "center" }}>
-                ${(item.price * item.quantity).toLocaleString()}
+                {typeof item.price === "number" && typeof item.quantity === "number" ? `$${(item.price * item.quantity).toLocaleString()}` : "$0"}
               </TableCell>
               {editable && handleRemoveProduct && (
-                <TableCell sx={{ textAlign: "center" }}>
+                <TableCell sx={{ textAlign: "center" }} className="no-print">
                   <button
                     style={{ background: "none", border: "none", color: "#d32f2f", fontWeight: 700, cursor: "pointer" }}
                     onClick={() => handleRemoveProduct(item.id)}

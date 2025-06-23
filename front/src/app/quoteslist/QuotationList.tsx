@@ -17,6 +17,9 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PersonIcon from '@mui/icons-material/Person';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { useRouter } from "next/navigation";
 import { useTheme } from "@mui/material/styles";
 import { useApi } from "../context/ApiContext";
@@ -83,16 +86,18 @@ const QuotationList: React.FC = () => {
       background: "linear-gradient(120deg, #fffbe6 0%, #f8fafc 100%)",
       minHeight: "100vh",
     }}>
-      <Typography
-        variant="h3"
-        fontWeight={900}
-        color="#ff6600"
-        mb={3}
-        letterSpacing={1}
-        sx={{ textShadow: "0 2px 8px #ffd8b3" }}
-      >
-        Listado de Cotizaciones
-      </Typography>
+      <Box display="flex" alignItems="center" mb={3}>
+        <ReceiptLongIcon sx={{ fontSize: 48, color: '#ff6600', mr: 2, filter: 'drop-shadow(0 2px 8px #ffd8b3)' }} />
+        <Typography
+          variant={isMobile ? "h4" : "h3"}
+          fontWeight={900}
+          color="#ff6600"
+          letterSpacing={1}
+          sx={{ textShadow: "0 2px 8px #ffd8b3" }}
+        >
+          Listado de Cotizaciones
+        </Typography>
+      </Box>
       <Paper sx={{ mb: 3, p: 2, borderRadius: 3, boxShadow: "0 2px 12px #ffd8b3" }}>
         <TextField
           variant="outlined"
@@ -123,27 +128,35 @@ const QuotationList: React.FC = () => {
         <Table size={isMobile ? "small" : "medium"}>
           <TableHead>
             <TableRow sx={{ background: "linear-gradient(90deg, #ffe0b2 0%, #fff3e0 100%)" }}>
-              <TableCell sx={{ color: "#ff6600", fontWeight: 700 }}>ID</TableCell>
-              <TableCell sx={{ color: "#ff6600", fontWeight: 700 }}>Cliente</TableCell>
-              <TableCell sx={{ color: "#ff6600", fontWeight: 700 }}>Fecha</TableCell>
-              <TableCell sx={{ color: "#ff6600", fontWeight: 700 }}>Total</TableCell>
-              <TableCell sx={{ color: "#ff6600", fontWeight: 700 }}>Acciones</TableCell>
+              <TableCell sx={{ color: "#ff6600", fontWeight: 700, fontSize: 16 }}>ID</TableCell>
+              <TableCell sx={{ color: "#ff6600", fontWeight: 700, fontSize: 16 }}>Cliente</TableCell>
+              <TableCell sx={{ color: "#ff6600", fontWeight: 700, fontSize: 16 }}>Fecha</TableCell>
+              <TableCell sx={{ color: "#ff6600", fontWeight: 700, fontSize: 16 }}>Total</TableCell>
+              <TableCell sx={{ color: "#ff6600", fontWeight: 700, fontSize: 16 }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredQuotations.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ color: '#b26a00', fontWeight: 600, py: 6 }}>
+                <TableCell colSpan={5} align="center" sx={{ color: '#b26a00', fontWeight: 600, py: 6, fontSize: 18 }}>
                   No hay cotizaciones para mostrar.
                 </TableCell>
               </TableRow>
             ) : (
               filteredQuotations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((quotation) => (
                 <TableRow key={quotation.id} hover sx={{ transition: 'background 0.2s', '&:hover': { background: '#fff8f3' } }}>
-                  <TableCell>{quotation.id}</TableCell>
-                  <TableCell>{quotation.customer?.nombre || "-"}</TableCell>
-                  <TableCell>{new Date(quotation.date).toLocaleDateString()}</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ff6600' }}>
+                  <TableCell sx={{ fontWeight: 700, color: '#1976d2', fontSize: 15 }}>{quotation.id}</TableCell>
+                  <TableCell>
+                    <Box display="flex" alignItems="center">
+                      <PersonIcon sx={{ color: '#ffb300', mr: 1 }} />
+                      <Typography fontWeight={600} color="#6d4c41" fontSize={15}>
+                        {quotation.customer?.nombre || <span style={{ color: '#bdbdbd', fontStyle: 'italic' }}>Sin cliente</span>}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 500, color: '#6d4c41', fontSize: 15 }}>{new Date(quotation.date).toLocaleDateString()}</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#ff6600', fontSize: 16, display: 'flex', alignItems: 'center' }}>
+                    <MonetizationOnIcon sx={{ color: '#43a047', mr: 0.5, fontSize: 20 }} />
                     ${getTotal(quotation).toLocaleString()}
                   </TableCell>
                   <TableCell>
@@ -151,7 +164,7 @@ const QuotationList: React.FC = () => {
                       variant="outlined"
                       color="warning"
                       size="small"
-                      sx={{ borderColor: '#ff6600', color: '#ff6600', fontWeight: 700, borderRadius: 2 }}
+                      sx={{ borderColor: '#ff6600', color: '#ff6600', fontWeight: 700, borderRadius: 2, px: 2, boxShadow: '0 1px 4px #ffe0b2' }}
                       onClick={() => router.push(`/quotations/${quotation.id}`)}
                     >
                       Ver

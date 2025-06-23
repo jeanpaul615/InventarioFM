@@ -24,6 +24,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 import AddIcon from "@mui/icons-material/Add";
+import GroupIcon from "@mui/icons-material/Group";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import PhoneIcon from "@mui/icons-material/Phone";
+import HomeIcon from "@mui/icons-material/Home";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import axios from "axios";
 import { useApi } from "../context/ApiContext";
 
@@ -123,11 +128,11 @@ const CustomerPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", mt: 6, p: { xs: 2, sm: 4 }, background: "#f4f8fb", borderRadius: 4, boxShadow: 6 }}>
+    <Box sx={{ maxWidth: 950, mx: "auto", mt: 6, p: { xs: 2, sm: 4 }, background: "linear-gradient(120deg, #f4f8fb 0%, #e3f2fd 100%)", borderRadius: 4, boxShadow: 8 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <PersonIcon color="primary" sx={{ fontSize: 44 }} />
-          <Typography variant="h4" fontWeight={800} color="primary.dark" letterSpacing={1}>
+          <GroupIcon sx={{ fontSize: 48, color: '#1976d2', filter: 'drop-shadow(0 2px 8px #bbdefb)' }} />
+          <Typography variant="h4" fontWeight={900} color="#1976d2" letterSpacing={1} sx={{ textShadow: "0 2px 8px #bbdefb" }}>
             Gestión de Clientes
           </Typography>
         </Box>
@@ -158,7 +163,7 @@ const CustomerPage: React.FC = () => {
           Nuevo Cliente
         </Button>
       </Box>
-      <Paper elevation={2} sx={{ borderRadius: 4, boxShadow: 2, p: 0, background: "#fff" }}>
+      <Paper elevation={3} sx={{ borderRadius: 4, boxShadow: 3, p: 0, background: "#fff" }}>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight={120}>
             <CircularProgress />
@@ -193,7 +198,7 @@ const CustomerPage: React.FC = () => {
                   borderRadius: 2,
                   mb: 1,
                   px: 2,
-                  py: 2,
+                  py: 2.5,
                   background: "#f9fbfd",
                   boxShadow: "0 1px 4px #e3eafc55",
                   '&:hover': { background: "#e3f2fd", boxShadow: "0 2px 8px #bbdefb55" },
@@ -205,9 +210,20 @@ const CustomerPage: React.FC = () => {
                       <Typography fontWeight={700} fontSize={20} color="#263238">
                         {customer.nombre}
                       </Typography>
-                      <Typography fontSize={15} color="#607d8b" mt={0.5}>
-                        <b>Cédula/NIT:</b> {customer.cedula || "-"} &nbsp;|&nbsp; <b>Tel:</b> {customer.telefono || "-"} &nbsp;|&nbsp; <b>Dir:</b> {customer.direccion || "-"} &nbsp;|&nbsp; <b>Lista:</b> {customer.caracterizacion || "-"}
-                      </Typography>
+                      <Box display="flex" flexWrap="wrap" gap={2} mt={0.5}>
+                        <Typography fontSize={15} color="#607d8b" display="flex" alignItems="center" gap={0.5}>
+                          <AssignmentIndIcon sx={{ fontSize: 18, color: '#bdbdbd' }} /> <b>Cédula/NIT:</b> {customer.cedula || "-"}
+                        </Typography>
+                        <Typography fontSize={15} color="#607d8b" display="flex" alignItems="center" gap={0.5}>
+                          <PhoneIcon sx={{ fontSize: 18, color: '#bdbdbd' }} /> <b>Tel:</b> {customer.telefono || "-"}
+                        </Typography>
+                        <Typography fontSize={15} color="#607d8b" display="flex" alignItems="center" gap={0.5}>
+                          <HomeIcon sx={{ fontSize: 18, color: '#bdbdbd' }} /> <b>Dir:</b> {customer.direccion || "-"}
+                        </Typography>
+                        <Typography fontSize={15} color="#607d8b" display="flex" alignItems="center" gap={0.5}>
+                          <ListAltIcon sx={{ fontSize: 18, color: '#bdbdbd' }} /> <b>Lista:</b> {customer.caracterizacion || "-"}
+                        </Typography>
+                      </Box>
                     </React.Fragment>
                   }
                 />
