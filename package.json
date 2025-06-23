@@ -1,0 +1,43 @@
+{
+  "name": "inventario-ferremolina",
+  "version": "1.0.0",
+  "description": "Sistema de Inventario y Facturación Ferremolina (Next.js + NestJS + Electron)",
+  "author": "Jean Paul Puerta",
+  "devDependencies": {
+    "electron": "^36.5.0",
+    "electron-builder": "^26.0.12"
+  },
+  "main": "main.js",
+  "build": {
+    "appId": "paul123.inventario-ferremolina",
+    "productName": "inventario-ferremolina",
+    "win": {
+      "target": "nsis"
+    },
+    "asar": true,
+    "icon": "ruta/a/tu/icono.ico"
+  },
+  "scripts": {
+    "electron": "electron .",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "fs-extra": "^11.3.0",
+    "next": "^15.3.4"
+  },
+  "pkg": {
+    "assets": [
+      "backend/dist/**/*",
+      "front/out/**/*"
+    ],
+    "files": [
+      "main.js",
+      "backend/dist/**/*",
+      "front/.next/**/*",
+      "front/node_modules/**/*",
+      "front/package.json",
+      "front/next.config.*"
+    ]
+  }
+}

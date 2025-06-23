@@ -240,68 +240,70 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
                   </ListItem>
                 )}
                 {filtered.map((product, idx) => (
-                  <ListItem
+                  <li
                     key={product.id}
-                    selected={selected?.id === product.id}
-                    onClick={() => setSelected(product)}
-                    sx={{
-                      cursor: "pointer",
-                      background: idx % 2 === 0 ? "#f7fafd" : "#fff",
-                      "&.Mui-selected": {
-                        background: "linear-gradient(90deg, #e3eafc 0%, #f9fafb 100%)",
-                        borderLeft: "4px solid #1565c0",
-                      },
-                      borderBottom: "1px solid #f0f0f0",
-                      transition: "background 0.2s",
-                      "&:hover": {
-                        background: "#e3eafc",
-                      },
+                    style={{
+                      listStyle: 'none',
+                      cursor: 'pointer',
+                      background: selected?.id === product.id
+                        ? 'linear-gradient(90deg, #e3eafc 0%, #f9fafb 100%)'
+                        : idx % 2 === 0
+                        ? '#f7fafd'
+                        : '#fff',
+                      borderLeft: selected?.id === product.id ? '4px solid #1565c0' : undefined,
+                      borderBottom: '1px solid #f0f0f0',
+                      transition: 'background 0.2s',
+                      padding: 0,
+                      margin: 0,
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        color="primary"
-                        disabled={product.cantidad === 0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelected(product);
-                          handleAdd();
-                        }}
-                        sx={{
-                          transition: "transform 0.2s",
-                          "&:active": { transform: "scale(1.2)" },
-                        }}
-                      >
-                        <AddCircleOutlineIcon />
-                      </IconButton>
-                    }
+                    onClick={() => setSelected(product)}
                   >
-                    <ListItemText
-                      primary={
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <span style={{ fontWeight: 500 }}>
-                            {product.nombre && product.nombre.trim() !== ""
-                              ? product.nombre
-                              : <span style={{ color: "red" }}>Sin nombre</span>}
+                    <div style={{ flex: 1 }}>
+                      <ListItemText
+                        primary={
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{ fontWeight: 500 }}>
+                              {product.nombre && product.nombre.trim() !== ''
+                                ? product.nombre
+                                : <span style={{ color: 'red' }}>Sin nombre</span>}
+                            </span>
+                            {product.cantidad <= 2 && (
+                              <Badge
+                                color="error"
+                                badgeContent="¡Stock bajo!"
+                                sx={{ ml: 1, '& .MuiBadge-badge': { fontSize: 10, height: 16, minWidth: 16 } }}
+                              />
+                            )}
                           </span>
-                          {product.cantidad <= 2 && (
-                            <Badge
-                              color="error"
-                              badgeContent="¡Stock bajo!"
-                              sx={{ ml: 1, "& .MuiBadge-badge": { fontSize: 10, height: 16, minWidth: 16 } }}
-                            />
-                          )}
-                        </span>
-                      }
-                      secondary={
-                        <span style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                          <span>
-                            Stock: <b>{product.cantidad}</b>
+                        }
+                        secondary={
+                          <span style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                            <span>
+                              Stock: <b>{product.cantidad}</b>
+                            </span>
                           </span>
-                        </span>
-                      }
-                    />
-                  </ListItem>
+                        }
+                      />
+                    </div>
+                    <IconButton
+                      edge="end"
+                      color="primary"
+                      disabled={product.cantidad === 0}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSelected(product);
+                        handleAdd();
+                      }}
+                      sx={{
+                        transition: 'transform 0.2s',
+                        '&:active': { transform: 'scale(1.2)' },
+                      }}
+                    >
+                      <AddCircleOutlineIcon />
+                    </IconButton>
+                  </li>
                 ))}
               </List>
             )}
