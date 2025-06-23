@@ -36,13 +36,22 @@ const AddInventoryModal: React.FC<AddInventoryModalProps> = ({ open, onClose, pr
     }
     setLoading(true);
     try {
+      // Obtener userId del localStorage (ajusta la clave si es diferente)
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = JSON.parse(userStr);
+          userId = userObj.userId || userObj.id || null;
+        }
+      } catch (e) { userId = null; }
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/products/${productId}/add-stock`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ cantidad: Number(cantidad) }),
+        body: JSON.stringify({ quantity: Number(cantidad), userId: userId }),
       });
       if (!res.ok) throw new Error('Error al agregar cantidad');
       setLoading(false);

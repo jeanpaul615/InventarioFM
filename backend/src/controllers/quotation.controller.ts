@@ -1,9 +1,7 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { QuotationService } from '../services/quotation.service';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('quotations')
-@UseGuards(JwtAuthGuard)
 export class QuotationController {
   constructor(private readonly quotationService: QuotationService) {}
 

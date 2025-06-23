@@ -36,6 +36,16 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
     setLoading(true);
     const formData = new FormData();
     formData.append('file', file);
+    // Obtener userId del localStorage y enviarlo siempre como string
+    let userId = '';
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        userId = String(userObj.userId || userObj.id || '');
+      }
+    } catch (e) { userId = ''; }
+    formData.append('userId', userId);
 
     try {
       const response = await fetch(`${baseUrl}/products/upload`, {
@@ -173,7 +183,6 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ onFileUpload }) => {
                     <tr style={{ background: '#e3e6f0' }}>
                       <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>nombre</th>
                       <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>valor_comercial</th>
-                      <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>valor_unitario</th>
                       <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>lista_1</th>
                       <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>lista_2</th>
                       <th style={{ border: '1px solid #cfd8dc', padding: '4px' }}>lista_3</th>

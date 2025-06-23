@@ -64,16 +64,19 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   };
 
   const onRemoveProduct = async (productId: number, billProductId?: number) => {
-    try {
-      if (billProductId) {
-        await axios.delete(`http://localhost:8000/bill-products/${billProductId}`);
-      } else {
-        await axios.delete(`http://localhost:8000/bills/${billId}/products/${productId}`);
+    // Confirmación directa (sin modal):
+    if (window.confirm('¿Estás seguro de que deseas eliminar este producto de la factura?')) {
+      try {
+        if (billProductId) {
+          await axios.delete(`http://localhost:8000/bill-products/${billProductId}`);
+        } else {
+          await axios.delete(`http://localhost:8000/bills/${billId}/products/${productId}`);
+        }
+        await handleRemoveProduct(productId);
+        console.log("Producto eliminado completamente de la base de datos y del estado local");
+      } catch (error) {
+        console.error("Error al eliminar el producto de la base de datos:", error);
       }
-      await handleRemoveProduct(productId);
-      console.log("Producto eliminado completamente de la base de datos y del estado local");
-    } catch (error) {
-      console.error("Error al eliminar el producto de la base de datos:", error);
     }
   };
 

@@ -16,12 +16,16 @@ export class InventoryLogService {
   async logIngreso(
     material: string,
     cantidad: number,
-    userId: number,
-    tipo: 'nuevo' | 'suma' = 'suma',
+    userId: number | null,
+    tipo?: 'nuevo' | 'suma',
   ) {
-    const usuario = await this.userRepo.findOneBy({ id: userId });
-    if (!usuario) throw new Error('Usuario no encontrado');
-    const log = this.logRepo.create({ material, cantidad, usuario, tipo });
+    let usuario: User | null = null;
+    if (userId) {
+      usuario = await this.userRepo.findOneBy({ id: userId });
+    }
+    // Si no se envía tipo, por defecto es 'suma'
+    const tipoFinal = tipo && tipo.length > 0 ? tipo : 'suma';
+    const log = this.logRepo.create({ material, cantidad, tipo: tipoFinal, ...(usuario ? { usuario } : {}) });
     return this.logRepo.save(log);
   }
 

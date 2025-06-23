@@ -11,11 +11,16 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import * as XLSX from 'xlsx';
 import { ProductService } from '../services/product.service';
 import { Product } from '../entities/product.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
 
 @Controller('products')
 export class ProductController {
@@ -104,15 +109,64 @@ export class ProductController {
   }
 
   @Post('upload')
-  async uploadFile(@Req() req: any): Promise<any> {
-    // Deshabilitado para evitar errores en scripts y pruebas
-    throw new Error('Funcionalidad de upload deshabilitada temporalmente para mantenimiento.');
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const name = path.basename(file.originalname, ext);
+        cb(null, `${name}-${Date.now()}${ext}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(xlsx|xls)$/)) {
+        return cb(new Error('Solo se permiten archivos Excel'), false);
+      }
+      cb(null, true);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  }))
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req: any): Promise<any> {
+    if (!file) {
+      throw new HttpException({ message: 'No se subió ningún archivo' }, HttpStatus.BAD_REQUEST);
+    }
+    // Procesar el archivo Excel
+    const workbook = XLSX.readFile(file.path);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    let data = XLSX.utils.sheet_to_json(sheet);
+    // Filtra/elimina la columna valor_unitario si existe
+    data = data.map((row: any) => {
+      const { valor_unitario, ...rest } = row;
+      return rest;
+    });
+    // Obtener userId del formData si viene (para carga masiva)
+    let userId = req.body?.userId || req.user?.userId || null;
+    if (typeof userId === 'string') userId = parseInt(userId);
+    await this.productService.bulkCreate(data, userId);
+    return { message: 'Archivo procesado y productos cargados correctamente' };
   }
 
   @Patch(':id/decrement-stock')
   async decrementStock(@Param('id') id: number, @Body('quantity') quantity: number) {
     try {
       return await this.productService.decrementStock(id, quantity);
+    } catch (error) {
+      throw new HttpException({ message: error.message }, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Patch(':id/add-stock')
+  async addStock(
+    @Param('id') id: number,
+    @Body('quantity') quantity: number,
+    @Body('userId') userIdFromBody: number,
+    @Req() req: any
+  ) {
+    try {
+      // Prioridad: userId del body (frontend), si no, del JWT
+      const userId = userIdFromBody ?? req.user?.userId ?? null;
+      return await this.productService.addStock(id, quantity, userId);
     } catch (error) {
       throw new HttpException({ message: error.message }, HttpStatus.BAD_REQUEST);
     }

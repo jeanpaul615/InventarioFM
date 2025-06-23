@@ -84,8 +84,11 @@ export class BillService {
   }
 
   async finalizeBill(billId: number) {
-    const bill = await this.billRepository.findOne({ where: { id: billId } });
+    const bill = await this.billRepository.findOne({ where: { id: billId }, relations: ['billProducts'] });
     if (!bill) throw new Error('Factura no encontrada');
+    if (!bill.billProducts || bill.billProducts.length === 0) {
+      throw new Error('No se puede finalizar una factura sin productos');
+    }
     bill.finalizada = true;
     return this.billRepository.save(bill);
   }

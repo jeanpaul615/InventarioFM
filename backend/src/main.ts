@@ -4,13 +4,9 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import multipart from '@fastify/multipart';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+ const app = await NestFactory.create(AppModule); // <--- NO uses FastifyAdapter aquí
 
-  // Registrar el plugin @fastify/multipart
-  await app.register(multipart);
+  
 
   // Configurar CORS para permitir peticiones desde el puerto 3000
   app.enableCors({

@@ -32,7 +32,7 @@ const BillingHeader: React.FC<BillingHeaderProps> = ({ currentBillId }) => (
       </Typography>
     </Box>
     <Box>
-      <img src="logo.webp" alt="Logo de Ferremolina" style={{ width: "100px", height: "auto" }} />
+      <img src="/logo.webp" alt="Logo de Ferremolina" style={{ width: "100px", height: "auto" }} />
     </Box>
   </Box>
 );

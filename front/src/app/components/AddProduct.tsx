@@ -24,13 +24,18 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
   const [form, setForm] = useState({
     nombre: '',
     valor_comercial: 0,
-    valor_unitario: 0,
     lista_1: 0,
     lista_2: 0,
     lista_3: 0,
     cantidad: 0,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // Estados para el formulario de log de inventario
+  const [material, setMaterial] = useState("");
+  const [cantidadLog, setCantidadLog] = useState(1);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,7 +45,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
     const tempErrors: { [key: string]: string } = {};
     if (!form.nombre) tempErrors.nombre = 'El nombre es obligatorio.';
     if (form.valor_comercial <= 0) tempErrors.valor_comercial = 'Debe ser mayor a 0.';
-    if (form.valor_unitario <= 0) tempErrors.valor_unitario = 'Debe ser mayor a 0.';
     if (form.lista_1 < 0) tempErrors.lista_1 = 'No puede ser negativo.';
     if (form.lista_2 < 0) tempErrors.lista_2 = 'No puede ser negativo.';
     if (form.lista_3 < 0) tempErrors.lista_3 = 'No puede ser negativo.';
@@ -49,11 +53,42 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  // handleSubmit para registrar ingreso en inventory-log
+  const handleLogSubmit = async (materialParam: string, cantidadParam: number, tipoParam: 'nuevo' | 'suma' = 'suma') => {
+    setSuccess("");
+    setError("");
+    try {
+      // Obtener userId del localStorage
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = JSON.parse(userStr);
+          userId = userObj.userId || userObj.id || null;
+        }
+      } catch (e) { userId = null; }
+      const res = await fetch(`${baseUrl}/inventory-log`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ material: materialParam, cantidad: cantidadParam, userId, tipo: 'nuevo' }), // tipo siempre 'nuevo'
+      });
+      if (!res.ok) throw new Error("Error al registrar ingreso");
+      setSuccess("Ingreso registrado correctamente");
+    } catch (err: any) {
+      setError(err.message || "Error inesperado");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validate()) return;
-
     try {
-      await axios.post(`${baseUrl}/products`, form, {
+      // Elimina valor_unitario antes de enviar al backend (ya no existe en el form)
+      const productData = form;
+      await handleLogSubmit(productData.nombre, productData.cantidad, 'nuevo'); // tipo 'nuevo' al crear producto
+      await axios.post(`${baseUrl}/products`, productData, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setOpen(false);
@@ -61,7 +96,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
       setForm({
         nombre: '',
         valor_comercial: 0,
-        valor_unitario: 0,
         lista_1: 0,
         lista_2: 0,
         lista_3: 0,
@@ -138,18 +172,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   onChange={handleChange}
                   error={!!errors.valor_comercial}
                   helperText={errors.valor_comercial}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="valor_unitario"
-                  label="Valor Unitario"
-                  type="number"
-                  fullWidth
-                  value={form.valor_unitario}
-                  onChange={handleChange}
-                  error={!!errors.valor_unitario}
-                  helperText={errors.valor_unitario}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>

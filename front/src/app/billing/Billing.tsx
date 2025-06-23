@@ -396,8 +396,13 @@ const Billing: React.FC = () => {
       setSelectedItems([]);
       setTotal(0);
       setCustomerName("");
+      setCustomerData({ nombre: '', cedula: '', direccion: '', telefono: '' });
       localStorage.removeItem("currentBillId");
       localStorage.removeItem("customerName");
+      localStorage.removeItem("customer_id");
+      localStorage.removeItem("customer_cedula");
+      localStorage.removeItem("customer_direccion");
+      localStorage.removeItem("customer_telefono");
       showAlert("Inventario actualizado y factura finalizada. Factura reiniciada.", "success");
     } catch (error) {
       showAlert("Error al actualizar inventario o factura", "error");

@@ -32,7 +32,7 @@ const InvoiceHeader: React.FC<InvoiceHeaderProps> = ({ currentBillId, customer }
         }}
       >
         <img
-          src="logo.webp"
+          src="/logo.webp"
           alt="Logo de Ferremolina"
           style={{
             width: isSmallScreen ? 48 : 72,

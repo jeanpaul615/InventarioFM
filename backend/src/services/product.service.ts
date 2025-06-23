@@ -75,16 +75,15 @@ export class ProductService {
         return product;
       });
       const savedProducts = await this.productRepository.save(productEntities);
-      // Registrar en inventory-log cada producto nuevo
-      if (userId) {
-        for (const p of savedProducts) {
-          await this.inventoryLogService.logIngreso(
-            p.nombre,
-            p.cantidad,
-            userId,
-            'nuevo'
-          );
-        }
+      // Registrar en inventory-log cada producto nuevo, siempre (userId o 0)
+      const logUserId = userId ?? 0;
+      for (const p of savedProducts) {
+        await this.inventoryLogService.logIngreso(
+          p.nombre,
+          p.cantidad,
+          logUserId,
+          'nuevo'
+        );
       }
       console.log('Productos guardados:', savedProducts.length);
     } catch (error) {
@@ -124,5 +123,20 @@ export class ProductService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async addStock(productId: number, quantity: number, userId?: number | null) {
+    const product = await this.productRepository.findOneBy({ id: productId });
+    if (!product) throw new Error('Producto no encontrado');
+    product.cantidad += quantity;
+    await this.productRepository.save(product);
+    // Registrar log de ingreso (tipo suma)
+    await this.inventoryLogService.logIngreso(
+      product.nombre,
+      quantity,
+      userId ?? null,
+      'suma'
+    );
+    return { message: 'Stock sumado correctamente', product };
   }
 }
