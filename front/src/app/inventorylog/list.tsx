@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -31,7 +31,7 @@ interface InventoryLog {
   fecha: string;
   material: string;
   cantidad: number;
-  usuario: { username: string };
+  usuario: { username: string } | null;
   tipo: 'nuevo' | 'suma';
 }
 
@@ -45,6 +45,32 @@ const InventoryLogList: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const router = useRouter();
 
+  // Función para cargar logs, reutilizable
+  const fetchLogs = useCallback(() => {
+    if (!token) return;
+    setLoading(true);
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/inventory-log`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(async res => {
+        if (res.status === 401) {
+          window.alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+          localStorage.removeItem('token');
+          router.push('/login');
+          return [];
+        }
+        return res.json();
+      })
+      .then(data => {
+        setLogs(Array.isArray(data) ? data : []);
+      })
+      .catch(error => {
+        console.error('Error fetching logs:', error);
+        setLogs([]);
+      })
+      .finally(() => setLoading(false));
+  }, [token, router]);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
@@ -55,35 +81,16 @@ const InventoryLogList: React.FC = () => {
   }, [router]);
 
   useEffect(() => {
-    if (!token) return;
-    fetch("http://localhost:8000/inventory-log", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(data => setLogs(data))
-      .finally(() => setLoading(false));
-  }, [token]);
+    fetchLogs();
+  }, [fetchLogs]);
 
-  const handleAdded = () => {
-    setLoading(true);
-    fetch("http://localhost:8000/inventory-log", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(data => setLogs(data))
-      .finally(() => setLoading(false));
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
+  const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const paginatedLogs = logs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedLogs = Array.isArray(logs) ? logs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : [];
 
   return (
     <Paper elevation={6} sx={{ p: 4, maxWidth: 950, mx: "auto", mt: 6, borderRadius: 4, boxShadow: "0 8px 32px #ffb74d99", background: "#fffdfa" }}>
@@ -92,7 +99,7 @@ const InventoryLogList: React.FC = () => {
           <Inventory2Icon sx={{ mr: 1, fontSize: 32, color: '#ff6600' }} />
           Historial de Ingresos al Inventario
         </Typography>
-        <AddInventoryButton onAdded={handleAdded} />
+        <AddInventoryButton onAdded={fetchLogs} />
       </Stack>
       <Divider sx={{ mb: 2, borderColor: '#ffcc80' }} />
       {loading ? (
@@ -112,7 +119,7 @@ const InventoryLogList: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {logs.length === 0 ? (
+              {!Array.isArray(logs) || logs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ color: "#bdbdbd", fontStyle: "italic", fontSize: 18 }}>
                     No hay ingresos registrados.

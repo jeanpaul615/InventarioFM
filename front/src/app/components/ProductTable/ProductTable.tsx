@@ -109,7 +109,7 @@ const ProductTable: React.FC = () => {
   return (
     <React.Fragment>
       <div className="bg-amber-50 flex items-center justify-center p-5">
-        <Image src="/logo.webp" alt="Logo" width={200} height={50} />
+        <img src="/logo.webp" alt="Logo" width={200} height={50}/>
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 ml-3 drop-shadow-lg">
           INVENTARIO FERREMOLINA
         </h1>

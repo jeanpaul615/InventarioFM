@@ -36,24 +36,40 @@ const AddInventoryModal: React.FC<AddInventoryModalProps> = ({ open, onClose, pr
     }
     setLoading(true);
     try {
-      // Obtener userId del localStorage (ajusta la clave si es diferente)
+      // Obtener userId del localStorage
       let userId = null;
       try {
         const userStr = localStorage.getItem("user");
         if (userStr) {
           const userObj = JSON.parse(userStr);
           userId = userObj.userId || userObj.id || null;
+          // Asegurar que userId sea un número
+          if (userId) {
+            userId = Number(userId);
+          }
         }
-      } catch (e) { userId = null; }
+      } catch (e) { 
+        console.error("Error parsing user from localStorage:", e);
+        userId = null; 
+      }
+      
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/products/${productId}/add-stock`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ quantity: Number(cantidad), userId: userId }),
+        body: JSON.stringify({ 
+          quantity: Number(cantidad), 
+          userId: userId 
+        }),
       });
-      if (!res.ok) throw new Error('Error al agregar cantidad');
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Error al agregar cantidad');
+      }
+      
       setLoading(false);
       setProductId("");
       setCantidad("");
@@ -61,7 +77,8 @@ const AddInventoryModal: React.FC<AddInventoryModalProps> = ({ open, onClose, pr
       onClose();
     } catch (e) {
       setLoading(false);
-      setError('Error al agregar cantidad');
+      console.error("Error adding stock:", e);
+      setError(e instanceof Error ? e.message : 'Error al agregar cantidad');
     }
   };
 

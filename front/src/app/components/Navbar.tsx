@@ -25,6 +25,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import LockResetIcon from '@mui/icons-material/LockReset';
+import ReplayIcon from '@mui/icons-material/Replay'; // Nuevo ícono para devoluciones
 
 import { useRouter } from 'next/navigation'
 import { styled } from '@mui/system';
@@ -44,6 +45,9 @@ const NAVIGATION_INVENTORY = [
 ];
 const NAVIGATION_CLIENTS = [
   { title: 'Clientes', icon: <ContactMailIcon sx={{ color: '#ff9800' }} />, path: '/customer' },
+];
+const NAVIGATION_RETURNS = [
+  { title: 'Devoluciones', icon: <ReplayIcon sx={{ color: '#1976d2' }} />, path: '/returns' },
 ];
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
@@ -168,6 +172,16 @@ const Navbar: React.FC = () => {
         <Divider />
         <List subheader={<Typography sx={{ pl: 2, pt: 1, color: '#ff9800', fontWeight: 700 }}>Clientes</Typography>}>
           {NAVIGATION_CLIENTS.map((item) => (
+            <ListItem component="button" key={item.title} onClick={() => handleNavigation(item.path)} sx={{ ...navItemSx }}>
+              <ListItemIcon sx={{ ...iconSx }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.title} primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1rem' }} />
+            </ListItem>
+          ))}
+        </List>
+        {/* NUEVO GRUPO DEVOLUCIONES */}
+        <Divider />
+        <List subheader={<Typography sx={{ pl: 2, pt: 1, color: '#1976d2', fontWeight: 700 }}>Devoluciones</Typography>}>
+          {NAVIGATION_RETURNS.map((item) => (
             <ListItem component="button" key={item.title} onClick={() => handleNavigation(item.path)} sx={{ ...navItemSx }}>
               <ListItemIcon sx={{ ...iconSx }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.title} primaryTypographyProps={{ fontWeight: 'bold', fontSize: '1rem' }} />

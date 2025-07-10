@@ -24,21 +24,24 @@ import { AuthController } from './controllers/auth.controller';
 import { InventoryLog } from './entities/inventory-log.entity';
 import { InventoryLogService } from './services/inventory-log.service';
 import { InventoryLogController } from './controllers/inventory-log.controller';
+import { Return } from './entities/returns.entity'; 
+import { ReturnsService } from './services/returns.service';
+import { ReturnsController } from './controllers/returns.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'database.sqlite',
-      entities: [User, Product, Bill, BillProduct, Customer, Quotation, QuotationProduct, InventoryLog], 
+      entities: [User, Product, Bill, BillProduct, Customer, Quotation, QuotationProduct, InventoryLog, Return], 
       logging: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Product, BillProduct, Bill, Customer, Quotation, QuotationProduct, InventoryLog]),
+    TypeOrmModule.forFeature([User, Product, BillProduct, Bill, Customer, Quotation, QuotationProduct, InventoryLog, Return]),
     AuthModule,
   ],
-  controllers: [AppController, ProductController, BillController, BillProductController, CustomerController, QuotationController, AuthController, InventoryLogController], 
-  providers: [AppService, ProductService, BillProductService, BillService, CustomerService, QuotationService, InventoryLogService],
+  controllers: [AppController, ProductController, BillController, BillProductController, CustomerController, QuotationController, AuthController, InventoryLogController, ReturnsController], 
+  providers: [AppService, ProductService, BillProductService, BillService, CustomerService, QuotationService, InventoryLogService, ReturnsService],
   exports: [TypeOrmModule],
 })
 export class AppModule {}
