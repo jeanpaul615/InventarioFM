@@ -9,13 +9,13 @@ interface Product {
 }
 
 const AddInventoryButton: React.FC<{ onAdded: () => void }> = ({ onAdded }) => {
-  const { token } = useApi();
+  const { token, baseUrl } = useApi();
   const [open, setOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    if (!token) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/products`, {
+    if (!token || !baseUrl) return;
+    fetch(`${baseUrl}/products`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
@@ -27,7 +27,7 @@ const AddInventoryButton: React.FC<{ onAdded: () => void }> = ({ onAdded }) => {
         else if (data.items) setProducts(data.items);
       })
       .catch(() => setProducts([]));
-  }, [token]);
+  }, [token, baseUrl]);
 
   return (
     <>

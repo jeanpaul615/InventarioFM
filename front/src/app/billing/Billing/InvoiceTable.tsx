@@ -22,6 +22,7 @@ import QuantityModal from "./QuantityModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useRouter } from 'next/navigation';
+import { useApi } from "../../context/ApiContext";
 
 interface InvoiceTableProps {
   groupedItems: (InventoryItem & { quantity: number, billProductId?: number })[];
@@ -40,6 +41,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   total,
   updateTotal,
 }) => {
+  const { baseUrl } = useApi();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,14 +58,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   }, [router]);
 
   const onQuantityChange = async (productId: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1 || !baseUrl) return;
     // Primero actualiza el estado local antes de calcular el total
     await handleQuantityChange(productId, newQuantity);
     // Calcula el total usando el nuevo estado (no el groupedItems anterior)
     // Opcional: puedes pedirle al padre que recalcule el total, o forzar un refetch
     try {
       const response = await axios.patch(
-        `http://localhost:8000/bills/${billId}/products/${productId}/quantity`,
+        `${baseUrl}/bills/${billId}/products/${productId}/quantity`,
         {
           quantity: newQuantity,
         }
@@ -75,13 +77,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   };
 
   const onRemoveProduct = async (productId: number, billProductId?: number) => {
+    if (!baseUrl) return;
     // Confirmación directa (sin modal):
     if (window.confirm('¿Estás seguro de que deseas eliminar este producto de la factura?')) {
       try {
         if (billProductId) {
-          await axios.delete(`http://localhost:8000/bill-products/${billProductId}`);
+          await axios.delete(`${baseUrl}/bill-products/${billProductId}`);
         } else {
-          await axios.delete(`http://localhost:8000/bills/${billId}/products/${productId}`);
+          await axios.delete(`${baseUrl}/bills/${billId}/products/${productId}`);
         }
         await handleRemoveProduct(productId);
         console.log("Producto eliminado completamente de la base de datos y del estado local");
@@ -95,10 +98,42 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     const invoiceElement = document.getElementById("invoice");
     if (!invoiceElement) return;
 
+    // Guardar estilos originales
+    const originalWidth = invoiceElement.style.width;
+    const originalMinWidth = invoiceElement.style.minWidth;
+    const originalOverflow = invoiceElement.style.overflow;
+    
+    // Forzar ancho de escritorio para la captura
+    invoiceElement.style.width = '1024px';
+    invoiceElement.style.minWidth = '1024px';
+    invoiceElement.style.overflow = 'visible';
+
+    // Forzar tamaños de fuente de escritorio en todas las celdas
+    const tableCells = invoiceElement.querySelectorAll('th, td');
+    const originalFontSizes: string[] = [];
+    tableCells.forEach((cell, index) => {
+      const htmlCell = cell as HTMLElement;
+      originalFontSizes[index] = htmlCell.style.fontSize || '';
+      htmlCell.style.fontSize = '16px';
+    });
+
+    // Esperar un momento para que el DOM se actualice
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     const canvas = await html2canvas(invoiceElement, {
-      scale: 2, // Escalado para mejorar la calidad
+      scale: 3, // Escalado para mejorar la calidad
       backgroundColor: "#fff",
       useCORS: true,
+      width: 1024,
+      windowWidth: 1024,
+    });
+
+    // Restaurar estilos originales
+    invoiceElement.style.width = originalWidth;
+    invoiceElement.style.minWidth = originalMinWidth;
+    invoiceElement.style.overflow = originalOverflow;
+    tableCells.forEach((cell, index) => {
+      (cell as HTMLElement).style.fontSize = originalFontSizes[index];
     });
 
     const imgData = canvas.toDataURL("image/png", 1.0);

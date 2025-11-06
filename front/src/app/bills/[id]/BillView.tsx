@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useApi } from "../../context/ApiContext";
 
 interface BillProduct {
   id: number;
@@ -35,16 +36,17 @@ interface Bill {
 }
 
 const BillView: React.FC = () => {
+  const { baseUrl } = useApi();
   const params = useParams();
   const billId = params?.id;
   const [bill, setBill] = useState<Bill | null>(null);
 
   useEffect(() => {
-    if (!billId) return;
-    fetch(`http://localhost:8000/bills/${billId}`)
+    if (!billId || !baseUrl) return;
+    fetch(`${baseUrl}/bills/${billId}`)
       .then(res => res.json())
       .then(data => setBill(data));
-  }, [billId]);
+  }, [billId, baseUrl]);
 
   const getTotal = () =>
     bill?.billProducts.reduce((acc, bp) => acc + bp.price * bp.quantity, 0) ?? 0;

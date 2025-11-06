@@ -8,13 +8,20 @@ async function bootstrap() {
 
   
 
-  // Configurar CORS para permitir peticiones desde el puerto 3000
+  // Configurar CORS para permitir peticiones desde cualquier origen en red local
   app.enableCors({
-    origin: 'http://localhost:3000', // Permitir peticiones desde este origen
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
-    credentials: true, // Permitir envío de cookies si es necesario
+    origin: true, // Permitir todos los orígenes (ideal para red local)
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   await app.listen(8000, '0.0.0.0');
+  console.log('');
+  console.log('🚀 Backend iniciado correctamente');
+  console.log('📍 Local: http://localhost:8000');
+  console.log('🌐 Red: http://0.0.0.0:8000');
+  console.log('✅ CORS habilitado para todos los orígenes');
+  console.log('');
 }
 bootstrap();

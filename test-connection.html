@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Conexión - Inventario FM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #4caf50; color: white; }
+        .error { background: #f44336; color: white; }
+        .pending { background: #ff9800; color: white; }
+        button {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #0b7dda; }
+    </style>
+</head>
+<body>
+    <h1>🔌 Test de Conexión</h1>
+    
+    <div class="test-box">
+        <h3>Frontend</h3>
+        <div id="frontend-status" class="status pending">Probando...</div>
+        <p id="frontend-url"></p>
+    </div>
+
+    <div class="test-box">
+        <h3>Backend API</h3>
+        <div id="backend-status" class="status pending">Probando...</div>
+        <p id="backend-url"></p>
+        <p id="backend-response"></p>
+    </div>
+
+    <div class="test-box">
+        <h3>Base de Datos (Login Test)</h3>
+        <div id="db-status" class="status pending">Esperando...</div>
+        <button onclick="testLogin()">Probar Login</button>
+        <p id="db-response"></p>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost' ? 
+            'http://192.168.0.105:8000' : 
+            `http://${window.location.hostname}:8000`;
+
+        // Test Frontend
+        document.getElementById('frontend-status').textContent = '✓ Frontend Conectado';
+        document.getElementById('frontend-status').className = 'status success';
+        document.getElementById('frontend-url').textContent = `URL: ${window.location.href}`;
+
+        // Test Backend
+        fetch(`${API_URL}/`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('backend-status').textContent = '✓ Backend Conectado';
+                document.getElementById('backend-status').className = 'status success';
+                document.getElementById('backend-url').textContent = `URL: ${API_URL}`;
+                document.getElementById('backend-response').textContent = `Respuesta: ${JSON.stringify(data)}`;
+            })
+            .catch(err => {
+                document.getElementById('backend-status').textContent = '✗ Error de Conexión';
+                document.getElementById('backend-status').className = 'status error';
+                document.getElementById('backend-url').textContent = `URL intentada: ${API_URL}`;
+                document.getElementById('backend-response').textContent = `Error: ${err.message}`;
+            });
+
+        function testLogin() {
+            document.getElementById('db-status').textContent = 'Probando login...';
+            document.getElementById('db-status').className = 'status pending';
+
+            fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: 'CRISTIAN BRAN',
+                    password: '12345'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.access_token) {
+                    document.getElementById('db-status').textContent = '✓ Base de Datos Conectada';
+                    document.getElementById('db-status').className = 'status success';
+                    document.getElementById('db-response').textContent = `Usuario autenticado: ${data.user.username}`;
+                } else {
+                    throw new Error('No se recibió token');
+                }
+            })
+            .catch(err => {
+                document.getElementById('db-status').textContent = '✗ Error de Autenticación';
+                document.getElementById('db-status').className = 'status error';
+                document.getElementById('db-response').textContent = `Error: ${err.message}`;
+            });
+        }
+    </script>
+</body>
+</html>

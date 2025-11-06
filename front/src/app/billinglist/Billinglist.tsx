@@ -19,6 +19,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@mui/material/styles";
+import { useApi } from "../context/ApiContext";
 
 interface BillProduct {
   id: number;
@@ -38,6 +39,7 @@ interface Bill {
 }
 
 const BillingList: React.FC = () => {
+  const { baseUrl } = useApi();
   const [bills, setBills] = useState<Bill[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
@@ -47,10 +49,11 @@ const BillingList: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    fetch("http://localhost:8000/bills")
+    if (!baseUrl) return;
+    fetch(`${baseUrl}/bills`)
       .then(res => res.json())
       .then(data => setBills(data));
-  }, []);
+  }, [baseUrl]);
 
   // Calcula el total de una factura
   const getTotal = (bill: Bill) =>

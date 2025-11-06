@@ -4,7 +4,7 @@ import { Box, Button, TextField, Typography, Paper, Alert } from "@mui/material"
 import { useApi } from "../context/ApiContext";
 
 const InventoryLogForm: React.FC = () => {
-  const { token, user } = useApi();
+  const { token, user, baseUrl } = useApi();
   const [material, setMaterial] = useState("");
   const [cantidad, setCantidad] = useState(1);
   const [success, setSuccess] = useState("");
@@ -14,8 +14,12 @@ const InventoryLogForm: React.FC = () => {
     e.preventDefault();
     setSuccess("");
     setError("");
+    if (!baseUrl) {
+      setError("Error de conexión");
+      return;
+    }
     try {
-      const res = await fetch("http://localhost:8000/inventory-log", {
+      const res = await fetch(`${baseUrl}/inventory-log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

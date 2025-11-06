@@ -10,6 +10,7 @@ import QuotationTable from "./QuotationTable";
 import InvoiceTotals from "./InvoiceTotals";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useApi } from "../context/ApiContext";
 
 // Tipo específico para cotización
 interface InventoryItem {
@@ -23,6 +24,7 @@ interface InventoryItem {
 }
 
 const Quotation: React.FC = () => {
+  const { baseUrl } = useApi();
   const [selectedItems, setSelectedItems] = useState<
     { item: InventoryItem; quantity: number }[]
   >([]);
@@ -116,6 +118,10 @@ const Quotation: React.FC = () => {
       showAlert("Agrega al menos un producto", "error");
       return;
     }
+    if (!baseUrl) {
+      showAlert("Error de conexión", "error");
+      return;
+    }
     try {
       const payload = {
         customer: customer.id,
@@ -125,7 +131,7 @@ const Quotation: React.FC = () => {
           price: item.price,
         })),
       };
-      const res = await fetch("http://localhost:8000/quotations", {
+      const res = await fetch(`${baseUrl}/quotations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -159,12 +165,44 @@ const Quotation: React.FC = () => {
       (element as HTMLElement).style.display = 'none';
     });
 
+    // Guardar estilos originales
+    const originalWidth = invoiceElement.style.width;
+    const originalMinWidth = invoiceElement.style.minWidth;
+    const originalOverflow = invoiceElement.style.overflow;
+    
+    // Forzar ancho de escritorio para la captura
+    invoiceElement.style.width = '1024px';
+    invoiceElement.style.minWidth = '1024px';
+    invoiceElement.style.overflow = 'visible';
+
+    // Forzar tamaños de fuente de escritorio en todas las celdas
+    const tableCells = invoiceElement.querySelectorAll('th, td');
+    const originalFontSizes: string[] = [];
+    tableCells.forEach((cell, index) => {
+      const htmlCell = cell as HTMLElement;
+      originalFontSizes[index] = htmlCell.style.fontSize || '';
+      htmlCell.style.fontSize = '16px';
+    });
+
+    // Esperar un momento para que el DOM se actualice
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Aumenta la resolución del canvas
-    const scale = 4;
+    const scale = 3;
     const canvas = await html2canvas(invoiceElement, {
       scale,
       backgroundColor: "#fff",
       useCORS: true,
+      width: 1024,
+      windowWidth: 1024,
+    });
+
+    // Restaurar estilos originales
+    invoiceElement.style.width = originalWidth;
+    invoiceElement.style.minWidth = originalMinWidth;
+    invoiceElement.style.overflow = originalOverflow;
+    tableCells.forEach((cell, index) => {
+      (cell as HTMLElement).style.fontSize = originalFontSizes[index];
     });
 
     // Restaurar elementos no imprimibles

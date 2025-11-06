@@ -30,14 +30,19 @@ const ProductTable: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Estado para el orden de clasificación
+  const [loading, setLoading] = useState(true); // Estado de carga
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(`${baseUrl}/products?limit=100000`);
+      const response = await axios.get(`${baseUrl}/products?limit=100000`, {
+        timeout: 10000, // 10 segundos de timeout
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       const data = response.data;
       if (Array.isArray(data)) {
         setProducts(data);
@@ -47,15 +52,25 @@ const ProductTable: React.FC = () => {
         setProducts([]);
       }
     } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+      console.error('Error fetching products:', error);
+      if (error.code === 'ECONNABORTED') {
+        setSnackbarMessage('Tiempo de espera agotado. Verifica tu conexión.');
+        setSnackbarOpen(true);
+      } else if (error.response && error.response.status === 401) {
         setSnackbarMessage('No autorizado. Por favor, inicia sesión de nuevo.');
         setSnackbarOpen(true);
-        setProducts([]);
-      } else {
-        setSnackbarMessage('Error al cargar productos.');
+        // Redirigir al login después de 2 segundos
+        setTimeout(() => router.push('/login'), 2000);
+      } else if (error.message === 'Network Error' || !error.response) {
+        setSnackbarMessage('Error de conexión. Verifica que el servidor esté corriendo en ' + baseUrl);
         setSnackbarOpen(true);
-        setProducts([]);
+      } else {
+        setSnackbarMessage(`Error al cargar productos: ${error.message}`);
+        setSnackbarOpen(true);
       }
+      setProducts([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,28 +121,53 @@ const ProductTable: React.FC = () => {
     product.nombre.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Mostrar indicador de carga
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-amber-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-600"></div>
+        <p className="mt-4 text-xl font-semibold text-amber-800">Cargando productos...</p>
+        <p className="mt-2 text-sm text-gray-600">Conectando a {baseUrl}</p>
+      </div>
+    );
+  }
+
   return (
     <React.Fragment>
-      <div className="bg-amber-50 flex items-center justify-center p-5">
-        <img src="/logo.webp" alt="Logo" width={200} height={50}/>
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 ml-3 drop-shadow-lg">
+      {/* Header - Responsive */}
+      <div className="bg-amber-50 flex flex-col md:flex-row items-center justify-center p-3 md:p-5 gap-2 md:gap-3">
+        <img 
+          src="/logo.webp" 
+          alt="Logo" 
+          className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40"
+        />
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600 text-center drop-shadow-lg">
           INVENTARIO FERREMOLINA
         </h1>
       </div>
-      <Toolbar className="flex justify-between mb-4">
-        <SearchBar search={search} onSearchChange={handleSearch} />
-        <div className="flex space-x-4">
+
+      {/* Toolbar - Responsive */}
+      <Toolbar className="flex flex-col md:flex-row justify-between gap-3 md:gap-4 mb-4 px-2 md:px-4">
+        <div className="w-full md:flex-1">
+          <SearchBar search={search} onSearchChange={handleSearch} />
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full md:w-auto">
           <FileUploadButton onFileUpload={handleFileUpload} />
           <AddProduct onAdd={fetchProducts} />
         </div>
       </Toolbar>
-      <ProductTableContent
-        products={filteredProducts}
-        onDelete={handleDelete}
-        onUpdate={fetchProducts}
-        onSortById={handleSortById} // Pasar la función de ordenación
-        sortOrder={sortOrder} // Pasar el estado del orden actual
-      />
+
+      {/* Table Content */}
+      <div className="px-2 md:px-4">
+        <ProductTableContent
+          products={filteredProducts}
+          onDelete={handleDelete}
+          onUpdate={fetchProducts}
+          onSortById={handleSortById}
+          sortOrder={sortOrder}
+        />
+      </div>
+      
       <SnackbarNotification open={snackbarOpen} message={snackbarMessage} onClose={() => setSnackbarOpen(false)} />
     </React.Fragment>
   );

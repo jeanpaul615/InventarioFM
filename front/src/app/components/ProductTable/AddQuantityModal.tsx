@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Box, Typography, TextField, Button, CircularProgress } from '@mui/material';
+import { useApi } from '../../context/ApiContext';
 
 interface AddQuantityModalProps {
   open: boolean;
@@ -23,6 +24,7 @@ const style = {
 };
 
 const AddQuantityModal: React.FC<AddQuantityModalProps> = ({ open, onClose, productId, productName, onQuantityAdded }) => {
+  const { baseUrl } = useApi();
   const [quantity, setQuantity] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,10 +35,14 @@ const AddQuantityModal: React.FC<AddQuantityModalProps> = ({ open, onClose, prod
       setError('Ingrese una cantidad válida');
       return;
     }
+    if (!baseUrl) {
+      setError('Error de conexión');
+      return;
+    }
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/products/${productId}`, {
+      await fetch(`${baseUrl}/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

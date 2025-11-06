@@ -46,29 +46,43 @@ const QuotationList: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { token } = useApi();
+  const { token, baseUrl } = useApi();
 
   useEffect(() => {
-    if (!token) return;
-    fetch("http://localhost:8000/quotations", {
+    if (!token || !baseUrl) {
+      console.log('QuotationList: Esperando token o baseUrl', { token: !!token, baseUrl });
+      setLoading(false);
+      return;
+    }
+    console.log('QuotationList: Fetching quotations from', `${baseUrl}/quotations`);
+    setLoading(true);
+    fetch(`${baseUrl}/quotations`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
+        console.log('QuotationList: Response status', res.status);
         if (!res.ok) throw new Error("No autorizado");
         return res.json();
       })
       .then(data => {
+        console.log('QuotationList: Data received', data);
         if (Array.isArray(data)) {
           setQuotations(data);
         } else {
+          console.log('QuotationList: Data is not an array');
           setQuotations([]);
         }
       })
-      .catch(() => setQuotations([]));
-  }, [token]);
+      .catch(err => {
+        console.error('QuotationList: Error fetching quotations', err);
+        setQuotations([]);
+      })
+      .finally(() => setLoading(false));
+  }, [token, baseUrl]);
 
   // Redirige al login si no hay token
   useEffect(() => {
@@ -146,7 +160,15 @@ const QuotationList: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredQuotations.length === 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                  <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" gap={2}>
+                    <Typography color="#ff6600" fontWeight={600}>Cargando cotizaciones...</Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ) : filteredQuotations.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} align="center" sx={{ color: '#b26a00', fontWeight: 600, py: 6, fontSize: 18 }}>
                   No hay cotizaciones para mostrar.

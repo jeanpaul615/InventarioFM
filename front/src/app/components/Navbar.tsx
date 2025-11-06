@@ -68,9 +68,16 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setMounted(true);
-    // Redirigir al login si no hay usuario autenticado
-    if (mounted && !user) {
-      router.push('/login');
+  }, []);
+
+  useEffect(() => {
+    // Redirigir al login si no hay usuario autenticado (solo después del montaje)
+    if (mounted && !user && typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      // No redirigir si ya estamos en login o forgot-password
+      if (currentPath !== '/login' && currentPath !== '/forgot-password') {
+        router.push('/login');
+      }
     }
   }, [mounted, user, router]);
 
@@ -93,38 +100,137 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ background: 'linear-gradient(90deg, #232526 0%, #414345 100%)', boxShadow: '0 4px 24px #0008' }}>
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen} sx={{ mr: 2 }}>
+      <AppBar 
+        position="fixed" 
+        sx={{ 
+          background: 'linear-gradient(90deg, #232526 0%, #414345 100%)', 
+          boxShadow: '0 4px 24px #0008',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          '@media print': {
+            display: 'none', // Ocultar en impresión
+          }
+        }}
+      >
+        <Toolbar sx={{ 
+          minHeight: { xs: 56, sm: 64 },
+          px: { xs: 1, sm: 2 }
+        }}>
+          {/* Menú hamburguesa - Solo visible en pantallas */}
+          <IconButton 
+            edge="start" 
+            color="inherit" 
+            aria-label="menu" 
+            onClick={handleDrawerOpen} 
+            sx={{ 
+              mr: { xs: 1, sm: 2 },
+              display: { xs: 'block', md: 'block' }
+            }}
+          >
             <MenuIcon />
           </IconButton>
-          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="/logo.webp" alt="Logo" style={{ height: 48, marginRight: 16, borderRadius: 8, boxShadow: '0 2px 8px #ff9800' }} />
-            <Typography variant="h5" fontWeight={900} sx={{ color: '#ff9800', letterSpacing: 2, textShadow: '0 2px 8px #0006' }}>
+
+          {/* Logo y Título - Responsive */}
+          <Box sx={{ 
+            flex: 1, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: { xs: 'flex-start', sm: 'center' },
+            overflow: 'hidden',
+            mr: { xs: 1, sm: 2 }
+          }}>
+            <img 
+              src="/logo.webp" 
+              alt="Logo" 
+              style={{ 
+                height: window.innerWidth < 600 ? 32 : 48, 
+                marginRight: window.innerWidth < 600 ? 8 : 16, 
+                borderRadius: 8, 
+                boxShadow: '0 2px 8px #ff9800',
+                flexShrink: 0
+              }} 
+            />
+            <Typography 
+              variant="h5" 
+              fontWeight={900} 
+              sx={{ 
+                color: '#ff9800', 
+                letterSpacing: { xs: 0.5, sm: 1, md: 2 }, 
+                textShadow: '0 2px 8px #0006',
+                fontSize: { xs: '0.875rem', sm: '1.25rem', md: '1.5rem' },
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: { xs: 'none', sm: 'block' }
+              }}
+            >
               INVENTARIO FERREMOLINA
             </Typography>
+            {/* Título corto para móvil */}
+            <Typography 
+              variant="h6" 
+              fontWeight={900} 
+              sx={{ 
+                color: '#ff9800', 
+                fontSize: '0.875rem',
+                display: { xs: 'block', sm: 'none' }
+              }}
+            >
+              FERREMOLINA
+            </Typography>
           </Box>
+
+          {/* Botones de usuario - Responsive */}
           {user ? (
-            <>
-              <Typography sx={{ color: '#fff', fontWeight: 700, mr: 2 }}>
-                <PersonIcon sx={{ verticalAlign: 'middle', mr: 0.5 }} /> {user.username}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 } }}>
+              {/* Nombre de usuario - Ocultar en móvil */}
+              <Typography sx={{ 
+                color: '#fff', 
+                fontWeight: 700, 
+                display: { xs: 'none', md: 'flex' },
+                alignItems: 'center',
+                fontSize: { md: '0.875rem', lg: '1rem' }
+              }}>
+                <PersonIcon sx={{ verticalAlign: 'middle', mr: 0.5, fontSize: 20 }} /> 
+                {user.username}
               </Typography>
+              
+              {/* Botón de cerrar sesión */}
               <Button
                 color="inherit"
-                startIcon={<LogoutIcon />}
+                startIcon={<LogoutIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
                 onClick={() => { logout(); window.location.href = '/login'; }}
-                sx={{ fontWeight: 700, borderRadius: 2, background: '#ff6600', color: '#fff', ml: 1, '&:hover': { background: '#b26a00' } }}
+                sx={{ 
+                  fontWeight: 700, 
+                  borderRadius: 2, 
+                  background: '#ff6600', 
+                  color: '#fff', 
+                  '&:hover': { background: '#b26a00' },
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 1, sm: 2 },
+                  py: { xs: 0.5, sm: 1 },
+                  minWidth: { xs: 'auto', sm: 'auto' }
+                }}
               >
-                Cerrar sesión
+                <span className="hidden sm:inline">Cerrar sesión</span>
+                <span className="sm:hidden">Salir</span>
               </Button>
-            </>
+            </Box>
           ) : (
-            <>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 color="inherit"
                 startIcon={<PersonIcon />}
                 onClick={() => router.push('/login')}
-                sx={{ fontWeight: 700, borderRadius: 2, background: '#ff6600', color: '#fff', ml: 1, '&:hover': { background: '#b26a00' } }}
+                sx={{ 
+                  fontWeight: 700, 
+                  borderRadius: 2, 
+                  background: '#ff6600', 
+                  color: '#fff', 
+                  '&:hover': { background: '#b26a00' },
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 1, sm: 2 },
+                  display: { xs: 'none', sm: 'flex' }
+                }}
               >
                 Iniciar sesión
               </Button>
@@ -132,11 +238,20 @@ const Navbar: React.FC = () => {
                 color="inherit"
                 startIcon={<LockResetIcon />}
                 onClick={() => router.push('/forgot-password')}
-                sx={{ fontWeight: 700, borderRadius: 2, background: '#fff3e0', color: '#ff6600', ml: 1, '&:hover': { background: '#ffe0b2' } }}
+                sx={{ 
+                  fontWeight: 700, 
+                  borderRadius: 2, 
+                  background: '#fff3e0', 
+                  color: '#ff6600', 
+                  '&:hover': { background: '#ffe0b2' },
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 1, sm: 2 },
+                  display: { xs: 'none', sm: 'flex' }
+                }}
               >
                 Recuperar contraseña
               </Button>
-            </>
+            </Box>
           )}
         </Toolbar>
       </AppBar>

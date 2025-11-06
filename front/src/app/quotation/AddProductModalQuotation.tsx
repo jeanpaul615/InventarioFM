@@ -21,6 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
 import axios from "axios";
+import { useApi } from "../context/ApiContext";
 
 // Tipo específico para cotización
 interface InventoryItem {
@@ -40,6 +41,7 @@ interface AddProductModalQuotationProps {
 }
 
 const AddProductModalQuotation: React.FC<AddProductModalQuotationProps> = ({ open, onClose, onAdd }) => {
+  const { baseUrl } = useApi();
   const [products, setProducts] = useState<InventoryItem[]>([]);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<InventoryItem | null>(null);
@@ -48,13 +50,14 @@ const AddProductModalQuotation: React.FC<AddProductModalQuotationProps> = ({ ope
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
-    if (open) fetchProducts();
-  }, [open]);
+    if (open && baseUrl) fetchProducts();
+  }, [open, baseUrl]);
 
   const fetchProducts = async () => {
+    if (!baseUrl) return;
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8000/products?limit=10000`, {
+      const response = await axios.get(`${baseUrl}/products?limit=10000`, {
         headers: {},
       });
       const data = response.data;

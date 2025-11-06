@@ -14,6 +14,7 @@ import InvoiceTotals from "./Billing/InvoiceTotals";
 import InvoiceFooter from "./Billing/InvoiceFooter";
 import { InventoryItem } from "./Billing/InventoryItem";
 import InvoiceHeader from "./Billing/InvoiceHeader";
+import { useApi } from "../context/ApiContext";
 
 const mockInventory: InventoryItem[] = [
   { id: 1, name: "Producto A", price: 100, stock: 10 },
@@ -22,6 +23,7 @@ const mockInventory: InventoryItem[] = [
 ];
 
 const Billing: React.FC = () => {
+  const { baseUrl } = useApi();
   const [selectedItems, setSelectedItems] = useState<
     { item: InventoryItem & { billProductId?: number }; quantity: number }[]
   >([]);
@@ -39,11 +41,12 @@ const Billing: React.FC = () => {
 
   // Al montar, busca el customer_id y carga los datos del cliente
   useEffect(() => {
+    if (!baseUrl) return;
     const stored = localStorage.getItem("currentBillId");
     if (stored) setCurrentBillId(Number(stored));
     const storedCustomerId = localStorage.getItem("customer_id");
     if (storedCustomerId) {
-      fetch(`http://localhost:8000/customers/${storedCustomerId}`)
+      fetch(`${baseUrl}/customers/${storedCustomerId}`)
         .then(res => res.json())
         .then(data => {
           setCustomerData({
@@ -54,7 +57,7 @@ const Billing: React.FC = () => {
           });
         });
     }
-  }, []);
+  }, [baseUrl]);
 
   const [alert, setAlert] = useState<{ open: boolean; message: string; severity?: "success" | "error" | "info" | "warning" }>({
     open: false,
@@ -93,12 +96,44 @@ const Billing: React.FC = () => {
       (element as HTMLElement).style.display = 'none';
     });
 
+    // Guardar estilos originales
+    const originalWidth = invoiceElement.style.width;
+    const originalMinWidth = invoiceElement.style.minWidth;
+    const originalOverflow = invoiceElement.style.overflow;
+    
+    // Forzar ancho de escritorio para la captura
+    invoiceElement.style.width = '1024px';
+    invoiceElement.style.minWidth = '1024px';
+    invoiceElement.style.overflow = 'visible';
+
+    // Forzar tamaños de fuente de escritorio en todas las celdas
+    const tableCells = invoiceElement.querySelectorAll('th, td');
+    const originalFontSizes: string[] = [];
+    tableCells.forEach((cell, index) => {
+      const htmlCell = cell as HTMLElement;
+      originalFontSizes[index] = htmlCell.style.fontSize || '';
+      htmlCell.style.fontSize = '16px';
+    });
+
+    // Esperar un momento para que el DOM se actualice
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Aumenta la resolución del canvas
-    const scale = 4;
+    const scale = 3;
     const canvas = await html2canvas(invoiceElement, {
       scale,
       backgroundColor: "#fff",
       useCORS: true,
+      width: 1024,
+      windowWidth: 1024,
+    });
+
+    // Restaurar estilos originales
+    invoiceElement.style.width = originalWidth;
+    invoiceElement.style.minWidth = originalMinWidth;
+    invoiceElement.style.overflow = originalOverflow;
+    tableCells.forEach((cell, index) => {
+      (cell as HTMLElement).style.fontSize = originalFontSizes[index];
     });
 
     // Restaurar elementos no imprimibles
@@ -183,9 +218,9 @@ const Billing: React.FC = () => {
 
   useEffect(() => {
     const fetchBill = async () => {
-      if (!currentBillId) return;
+      if (!currentBillId || !baseUrl) return;
       try {
-        const response = await fetch(`http://localhost:8000/bills/${currentBillId}`);
+        const response = await fetch(`${baseUrl}/bills/${currentBillId}`);
         if (!response.ok) {
           showAlert("No se pudo obtener la factura actual", "error");
           return;
@@ -222,7 +257,7 @@ const Billing: React.FC = () => {
     };
 
     fetchBill();
-  }, [currentBillId]);
+  }, [currentBillId, baseUrl]);
 
 
   const createBillFlow = async (name: string) => {
@@ -237,7 +272,7 @@ const Billing: React.FC = () => {
 
     if (customerId) {
       // Si ya hay un customer_id, usa ese cliente existente
-      const res = await fetch(`http://localhost:8000/customers/${customerId}`);
+      const res = await fetch(`${baseUrl}/customers/${customerId}`);
       if (!res.ok) {
         showAlert("No se pudo obtener el cliente existente", "error");
         return;
@@ -245,7 +280,7 @@ const Billing: React.FC = () => {
       customer = await res.json();
     } else {
       // Si no hay customer_id, crea el cliente
-      const customerResponse = await fetch("http://localhost:8000/customers", {
+      const customerResponse = await fetch(`${baseUrl}/customers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -262,7 +297,7 @@ const Billing: React.FC = () => {
     }
 
     // 2. Crear la factura usando el ID del cliente
-    const billResponse = await fetch("http://localhost:8000/bills", {
+    const billResponse = await fetch(`${baseUrl}/bills`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -280,7 +315,7 @@ const Billing: React.FC = () => {
     // 3. (Opcional) Agregar productos a la factura si hay productos seleccionados
     if (selectedItems.length > 0) {
       for (const { item, quantity } of selectedItems) {
-        await fetch("http://localhost:8000/bill-products", {
+        await fetch(`${baseUrl}/bill-products`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -320,7 +355,7 @@ const Billing: React.FC = () => {
 
   const handleRemoveProduct = async (billProductId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/bill-products/${billProductId}`, {
+      const response = await fetch(`${baseUrl}/bill-products/${billProductId}`, {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -331,7 +366,7 @@ const Billing: React.FC = () => {
       showAlert("Producto eliminado de la factura", "success");
       // Recarga la factura para reflejar el cambio
       if (currentBillId) {
-        const res = await fetch(`http://localhost:8000/bills/${currentBillId}`);
+        const res = await fetch(`${baseUrl}/bills/${currentBillId}`);
         if (res.ok) {
           const bill = await res.json();
           if (Array.isArray(bill.billProducts)) {
@@ -380,14 +415,14 @@ const Billing: React.FC = () => {
     try {
       // 1. Actualizar el stock de cada producto en el backend
       for (const { item, quantity } of selectedItems) {
-        await fetch(`http://localhost:8000/products/${item.id}/decrement-stock`, {
+        await fetch(`${baseUrl}/products/${item.id}/decrement-stock`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ quantity }),
         });
       }
       // 2. Setear la factura como finalizada (o el estado que corresponda)
-      await fetch(`http://localhost:8000/bills/${currentBillId}/finalize`, {
+      await fetch(`${baseUrl}/bills/${currentBillId}/finalize`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
       });

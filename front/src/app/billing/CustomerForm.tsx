@@ -12,6 +12,7 @@ import {
   IconButton,
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
+import { useApi } from "../context/ApiContext";
 
 interface Customer {
   id?: number;
@@ -33,6 +34,7 @@ const listaLabels: Record<Customer["caracterizacion"], string> = {
 };
 
 const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
+  const { baseUrl } = useApi();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
@@ -47,12 +49,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
   const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
+    if (!baseUrl) return;
     setLoading(true);
-    fetch("http://localhost:8000/customers")
+    fetch(`${baseUrl}/customers`)
       .then((res) => res.json())
       .then((data) => setCustomers(data))
       .finally(() => setLoading(false));
-  }, []);
+  }, [baseUrl]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +81,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit }) => {
     setCreating(true);
     setSuccessMsg("");
     try {
-      const res = await fetch("http://localhost:8000/customers", {
+      const res = await fetch(`${baseUrl}/customers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

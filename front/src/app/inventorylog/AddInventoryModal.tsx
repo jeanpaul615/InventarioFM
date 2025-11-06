@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Box, Typography, TextField, Button, CircularProgress, MenuItem } from "@mui/material";
+import { useApi } from "../context/ApiContext";
 
 interface AddInventoryModalProps {
   open: boolean;
@@ -23,6 +24,7 @@ const style = {
 };
 
 const AddInventoryModal: React.FC<AddInventoryModalProps> = ({ open, onClose, products, token, onAdded }) => {
+  const { baseUrl } = useApi();
   const [productId, setProductId] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,7 @@ const AddInventoryModal: React.FC<AddInventoryModalProps> = ({ open, onClose, pr
         userId = null; 
       }
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/products/${productId}/add-stock`, {
+      const res = await fetch(`${baseUrl}/products/${productId}/add-stock`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

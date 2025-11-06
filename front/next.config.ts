@@ -2,7 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // output: "export", // Comentado para permitir modo servidor
-  /* config options here */
+  reactStrictMode: true,
+  images: {
+    unoptimized: true,
+  },
+  // Configuración para desarrollo
+  compress: true,
+  poweredByHeader: false,
 };
 
 export default nextConfig;

@@ -38,7 +38,7 @@ interface InventoryLog {
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 25, 50, 100];
 
 const InventoryLogList: React.FC = () => {
-  const { token } = useApi();
+  const { token, baseUrl } = useApi();
   const [logs, setLogs] = useState<InventoryLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -47,9 +47,9 @@ const InventoryLogList: React.FC = () => {
 
   // Función para cargar logs, reutilizable
   const fetchLogs = useCallback(() => {
-    if (!token) return;
+    if (!token || !baseUrl) return;
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/inventory-log`, {
+    fetch(`${baseUrl}/inventory-log`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async res => {
@@ -69,7 +69,7 @@ const InventoryLogList: React.FC = () => {
         setLogs([]);
       })
       .finally(() => setLoading(false));
-  }, [token, router]);
+  }, [token, baseUrl, router]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

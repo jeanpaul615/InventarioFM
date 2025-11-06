@@ -5,15 +5,79 @@
   --foreground: #171717;
 }
 
+/* Estilos de impresión mejorados */
 @media print {
-  .no-print {
+  /* Ocultar elementos no necesarios */
+  .no-print,
+  nav,
+  button,
+  .MuiAppBar-root,
+  .MuiDrawer-root,
+  .MuiSnackbar-root,
+  header,
+  footer {
     display: none !important;
   }
-}
 
-table {
-    width: 100% !important;
+  /* Forzar layout desktop en impresión */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+
+  /* Forzar vista de tabla en impresión (ocultar vista móvil) */
+  .md\:hidden {
+    display: none !important;
+  }
+
+  .md\:block {
+    display: block !important;
+  }
+
+  /* Asegurar que las tablas se vean completas */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Quitar padding del contenedor */
+  .pt-16 {
+    padding-top: 0 !important;
+  }
+
+  /* Ajustar tamaños de fuente para impresión */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  /* Mantener colores en impresión */
+  .bg-amber-50,
+  .bg-gradient-to-r {
+    background: white !important;
+  }
+
+  /* Forzar layout horizontal */
+  @page {
+    size: landscape;
+    margin: 1cm;
+  }
+}
 
 
 :root {

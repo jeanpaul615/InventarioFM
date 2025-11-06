@@ -119,13 +119,16 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       <Button
         variant="contained"
+        fullWidth
         sx={{
           backgroundColor: '#4caf50',
           '&:hover': { backgroundColor: '#388e3c' },
           fontWeight: 'bold',
+          fontSize: { xs: '0.875rem', sm: '1rem' },
+          padding: { xs: '8px 16px', sm: '10px 20px' },
         }}
         onClick={() => setOpen(true)}
       >
@@ -136,21 +139,36 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
         onClose={() => setOpen(false)}
         maxWidth="sm"
         fullWidth
+        fullScreen={typeof window !== 'undefined' && window.innerWidth < 600}
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: { xs: 0, sm: 3 },
             boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+            margin: { xs: 0, sm: 2 },
+            maxHeight: { xs: '100vh', sm: '90vh' },
           },
         }}
       >
-        <DialogTitle>
-          <Typography fontWeight="bold" textAlign="center">
+        <DialogTitle sx={{ 
+          px: { xs: 2, sm: 3 }, 
+          py: { xs: 2, sm: 2.5 },
+          borderBottom: '1px solid #e0e0e0'
+        }}>
+          <Typography 
+            fontWeight="bold" 
+            textAlign="center"
+            fontSize={{ xs: '1.25rem', sm: '1.5rem' }}
+          >
             Agregar Nuevo Producto
           </Typography>
         </DialogTitle>
-        <DialogContent>
-          <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
-            <Grid container spacing={2}>
+        <DialogContent sx={{ 
+          px: { xs: 2, sm: 3 }, 
+          py: { xs: 2, sm: 3 },
+          overflowY: 'auto'
+        }}>
+          <Box component="form" noValidate autoComplete="off" sx={{ mt: { xs: 1, sm: 2 } }}>
+            <Grid container spacing={{ xs: 2, sm: 2.5 }}>
               <Grid item xs={12}>
                 <TextField
                   name="nombre"
@@ -160,6 +178,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   onChange={handleChange}
                   error={!!errors.nombre}
                   helperText={errors.nombre}
+                  size="medium"
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -172,6 +194,26 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   onChange={handleChange}
                   error={!!errors.valor_comercial}
                   helperText={errors.valor_comercial}
+                  size="medium"
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  name="cantidad"
+                  label="Cantidad"
+                  type="number"
+                  fullWidth
+                  value={form.cantidad}
+                  onChange={handleChange}
+                  error={!!errors.cantidad}
+                  helperText={errors.cantidad}
+                  size="medium"
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -184,6 +226,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   onChange={handleChange}
                   error={!!errors.lista_1}
                   helperText={errors.lista_1}
+                  size="medium"
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -196,6 +242,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   onChange={handleChange}
                   error={!!errors.lista_2}
                   helperText={errors.lista_2}
+                  size="medium"
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -208,29 +258,31 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   onChange={handleChange}
                   error={!!errors.lista_3}
                   helperText={errors.lista_3}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="cantidad"
-                  label="Cantidad"
-                  type="number"
-                  fullWidth
-                  value={form.cantidad}
-                  onChange={handleChange}
-                  error={!!errors.cantidad}
-                  helperText={errors.cantidad}
+                  size="medium"
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
                 />
               </Grid>
             </Grid>
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ 
+          px: { xs: 2, sm: 3 }, 
+          py: { xs: 2, sm: 2.5 },
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: 'column', sm: 'row' },
+          borderTop: '1px solid #e0e0e0'
+        }}>
           <Button
             onClick={() => setOpen(false)}
+            fullWidth
             sx={{
               color: '#f44336',
               '&:hover': { backgroundColor: 'rgba(244, 67, 54, 0.1)' },
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              py: { xs: 1.5, sm: 1 },
+              order: { xs: 2, sm: 1 }
             }}
           >
             Cancelar
@@ -238,9 +290,13 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
           <Button
             onClick={handleSubmit}
             variant="contained"
+            fullWidth
             sx={{
               backgroundColor: '#4caf50',
               '&:hover': { backgroundColor: '#388e3c' },
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              py: { xs: 1.5, sm: 1 },
+              order: { xs: 1, sm: 2 }
             }}
           >
             Agregar

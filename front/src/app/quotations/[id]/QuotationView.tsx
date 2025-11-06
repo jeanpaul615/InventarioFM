@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useApi } from "../../context/ApiContext";
 
 interface QuotationProduct {
   id: number;
@@ -35,16 +36,17 @@ interface Quotation {
 }
 
 const QuotationView: React.FC = () => {
+  const { baseUrl } = useApi();
   const params = useParams();
   const quotationId = params?.id;
   const [quotation, setQuotation] = useState<Quotation | null>(null);
 
   useEffect(() => {
-    if (!quotationId) return;
-    fetch(`http://localhost:8000/quotations/${quotationId}`)
+    if (!quotationId || !baseUrl) return;
+    fetch(`${baseUrl}/quotations/${quotationId}`)
       .then(res => res.json())
       .then(data => setQuotation(data));
-  }, [quotationId]);
+  }, [quotationId, baseUrl]);
 
   const getTotal = () =>
     quotation?.quotationProducts.reduce((acc, qp) => acc + qp.price * qp.quantity, 0) ?? 0;
@@ -53,11 +55,43 @@ const QuotationView: React.FC = () => {
     const invoiceElement = document.getElementById("quotation-invoice");
     if (!invoiceElement) return;
 
-    const scale = 4;
+    // Guardar estilos originales
+    const originalWidth = invoiceElement.style.width;
+    const originalMinWidth = invoiceElement.style.minWidth;
+    const originalOverflow = invoiceElement.style.overflow;
+    
+    // Forzar ancho de escritorio para la captura
+    invoiceElement.style.width = '1024px';
+    invoiceElement.style.minWidth = '1024px';
+    invoiceElement.style.overflow = 'visible';
+
+    // Forzar tamaños de fuente de escritorio en todas las celdas
+    const tableCells = invoiceElement.querySelectorAll('th, td');
+    const originalFontSizes: string[] = [];
+    tableCells.forEach((cell, index) => {
+      const htmlCell = cell as HTMLElement;
+      originalFontSizes[index] = htmlCell.style.fontSize || '';
+      htmlCell.style.fontSize = '16px';
+    });
+
+    // Esperar un momento para que el DOM se actualice
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const scale = 3;
     const canvas = await html2canvas(invoiceElement, {
       scale,
       backgroundColor: "#fff",
       useCORS: true,
+      width: 1024,
+      windowWidth: 1024,
+    });
+
+    // Restaurar estilos originales
+    invoiceElement.style.width = originalWidth;
+    invoiceElement.style.minWidth = originalMinWidth;
+    invoiceElement.style.overflow = originalOverflow;
+    tableCells.forEach((cell, index) => {
+      (cell as HTMLElement).style.fontSize = originalFontSizes[index];
     });
 
     const imgData = canvas.toDataURL("image/png", 1.0);

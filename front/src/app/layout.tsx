@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import React from 'react';
 import { ApiProvider } from './context/ApiContext';
+import ClientOnly from './components/ClientOnly';
+import ConnectionTest from './components/ConnectionTest';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,18 +24,24 @@ export const metadata: Metadata = {
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <ApiProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-amber-50 text-gray-900`}
-        >
-          <Navbar />
-          <div className="mx-auto pt-16 bg-amber-50">
-            {children}
-          </div>
-        </body>
-      </html>
-    </ApiProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-amber-50 text-gray-900`}
+        suppressHydrationWarning
+      >
+        <ClientOnly>
+          <ApiProvider>
+            <Navbar />
+            {/* Ajustar padding según el tamaño del navbar */}
+            <div className="mx-auto pt-14 sm:pt-16 md:pt-20 bg-amber-50 min-h-screen">
+              {children}
+            </div>
+            {/* Componente de diagnóstico - Solo en desarrollo */}
+            {process.env.NODE_ENV === 'development' && <ConnectionTest />}
+          </ApiProvider>
+        </ClientOnly>
+      </body>
+    </html>
   );
 };
 
