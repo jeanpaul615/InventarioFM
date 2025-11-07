@@ -24,6 +24,7 @@ interface UpdateProductProps {
     lista_2: number;
     lista_3: number;
     cantidad: number;
+    unidad?: string;
   };
   onUpdate: () => void;
 }
@@ -169,7 +170,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   name="cantidad"
                   label="Cantidad"
@@ -185,6 +186,41 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({ product, onUpdate }) => {
                     sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
                   }}
                 />
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <TextField
+                  name="unidad"
+                  label="Unidad"
+                  select
+                  fullWidth
+                  value={form.unidad || 'und'}
+                  onChange={handleChange}
+                  SelectProps={{
+                    native: true,
+                  }}
+                  size="medium"
+                  sx={{ background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px #e3eafc33' }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
+                >
+                  <option value="und">und</option>
+                  <option value="kg">kg</option>
+                  <option value="g">g</option>
+                  <option value="lb">lb</option>
+                  <option value="oz">oz</option>
+                  <option value="m">m</option>
+                  <option value="cm">cm</option>
+                  <option value="mm">mm</option>
+                  <option value="l">l</option>
+                  <option value="ml">ml</option>
+                  <option value="gal">gal</option>
+                  <option value="caja">caja</option>
+                  <option value="paquete">paquete</option>
+                  <option value="rollo">rollo</option>
+                  <option value="par">par</option>
+                  <option value="docena">docena</option>
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField

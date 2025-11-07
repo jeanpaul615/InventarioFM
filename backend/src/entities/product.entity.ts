@@ -27,6 +27,9 @@ export class Product {
   @Column('int')
   cantidad: number;
 
+  @Column({ nullable: true, default: 'und' })
+  unidad: string;
+
   @Column({ default: true })
   activo: boolean;
 

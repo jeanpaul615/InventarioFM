@@ -346,7 +346,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                     {item.name}
                   </TableCell>
                   <TableCell sx={{ color: "#263238", textAlign: "center", fontWeight: 600, fontSize: isMobile ? 14 : 16, letterSpacing: 1 }}>
-                    {item.quantity}
+                    {item.quantity} {item.unidad || 'und'}
                   </TableCell>
                   <TableCell
                     sx={{

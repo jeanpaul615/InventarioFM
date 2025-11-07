@@ -28,6 +28,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
     lista_2: 0,
     lista_3: 0,
     cantidad: 0,
+    unidad: 'und',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -100,6 +101,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
         lista_2: 0,
         lista_3: 0,
         cantidad: 0,
+        unidad: 'und',
       });
     } catch (error: any) {
       if (error.response) {
@@ -200,7 +202,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   name="cantidad"
                   label="Cantidad"
@@ -215,6 +217,40 @@ const AddProduct: React.FC<AddProductProps> = ({ onAdd }) => {
                     sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
                   }}
                 />
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <TextField
+                  name="unidad"
+                  label="Unidad"
+                  select
+                  fullWidth
+                  value={form.unidad}
+                  onChange={handleChange}
+                  size="medium"
+                  SelectProps={{
+                    native: true,
+                  }}
+                  InputLabelProps={{
+                    sx: { fontSize: { xs: '0.9rem', sm: '1rem' } }
+                  }}
+                >
+                  <option value="und">Und</option>
+                  <option value="kg">Kg</option>
+                  <option value="g">g</option>
+                  <option value="lb">Lb</option>
+                  <option value="oz">Oz</option>
+                  <option value="m">m</option>
+                  <option value="cm">cm</option>
+                  <option value="mm">mm</option>
+                  <option value="l">L</option>
+                  <option value="ml">mL</option>
+                  <option value="gal">Gal</option>
+                  <option value="caja">Caja</option>
+                  <option value="paquete">Paquete</option>
+                  <option value="rollo">Rollo</option>
+                  <option value="par">Par</option>
+                  <option value="docena">Docena</option>
+                </TextField>
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField

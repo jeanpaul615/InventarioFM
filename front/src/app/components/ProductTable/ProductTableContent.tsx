@@ -15,6 +15,7 @@ export interface Product {
   lista_2: number;
   lista_3: number;
   cantidad: number;
+  unidad?: string;
 }
 
 interface ProductTableContentProps {
@@ -172,7 +173,7 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
                 <TableCell>{product.lista_1.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</TableCell>
                 <TableCell>{product.lista_2.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</TableCell>
                 <TableCell>{product.lista_3.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</TableCell>
-                <TableCell>{product.cantidad}</TableCell>
+                <TableCell>{product.cantidad} {product.unidad || 'und'}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <UpdateProduct product={product} onUpdate={onUpdate} />
@@ -220,7 +221,7 @@ const ProductTableContent: React.FC<ProductTableContentProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between items-center border-b pb-2">
                 <span className="text-sm font-bold text-gray-600">ID: {product.id}</span>
-                <span className="text-xs bg-amber-100 px-2 py-1 rounded">Stock: {product.cantidad}</span>
+                <span className="text-xs bg-amber-100 px-2 py-1 rounded">Stock: {product.cantidad} {product.unidad || 'und'}</span>
               </div>
               
               <h3 className="font-bold text-lg text-gray-800">{product.nombre}</h3>
