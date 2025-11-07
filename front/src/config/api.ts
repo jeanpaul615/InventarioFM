@@ -11,7 +11,7 @@ export const getApiUrl = (): string => {
   }
   
   // Variable de entorno o IP por defecto
-  return process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.105:8000';
+  return process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.108:8000';
 };
 
 export const API_URL = getApiUrl();
