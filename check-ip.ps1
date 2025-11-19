@@ -12,7 +12,7 @@ Write-Host "📍 Tu IP actual es: $ipAddress" -ForegroundColor Green
 Write-Host ""
 
 # IP configurada en el proyecto
-$configuredIP = "192.168.0.108"
+$configuredIP = "192.168.0.109"
 
 Write-Host "⚙️  IP configurada en el proyecto: $configuredIP" -ForegroundColor Yellow
 Write-Host ""

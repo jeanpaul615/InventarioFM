@@ -8,5 +8,5 @@ Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd backend; npm r
 
 Write-Host "Ambos servidores están iniciándose en nuevas ventanas de PowerShell."
 
-Write-Host "Abriendo navegador en http://192.168.0.108:3000/ ..."
-Start-Process "http://192.168.0.108:3000/"
+Write-Host "Abriendo navegador en http://192.168.0.109:3000/ ..."
+Start-Process "http://192.168.0.109:3000/"

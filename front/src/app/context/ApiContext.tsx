@@ -15,7 +15,7 @@ const ApiContext = createContext<ApiContextProps | undefined>(undefined);
 export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
-  const [baseUrl, setBaseUrl] = useState<string>('http://192.168.0.108:8000');
+  const [baseUrl, setBaseUrl] = useState<string>('http://192.168.0.109:8000');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setBaseUrl(`http://${hostname}:8000`);
     } else {
       // Si es localhost, usar la IP de red para que funcione en todos lados
-      setBaseUrl('http://192.168.0.108:8000');
+      setBaseUrl('http://192.168.0.109:8000');
     }
   }, []);
 

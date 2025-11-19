@@ -103,7 +103,7 @@ El sistema está configurado para funcionar en red local. Para acceder desde otr
    ```powershell
    ipconfig
    ```
-   Busca la dirección IPv4 (ejemplo: 192.168.0.108)
+   Busca la dirección IPv4 (ejemplo: 192.168.0.109)
 
 2. Desde otro dispositivo en la misma red, accede a:
    ```

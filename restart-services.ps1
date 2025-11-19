@@ -35,8 +35,8 @@ Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd backend; npm r
 Write-Host "" -ForegroundColor Green
 Write-Host "Servicios iniciados correctamente!" -ForegroundColor Green
 Write-Host "Acceso local: http://localhost:3000" -ForegroundColor White
-Write-Host "Acceso red: http://192.168.0.108:3000" -ForegroundColor Yellow
+Write-Host "Acceso red: http://192.168.0.109:3000" -ForegroundColor Yellow
 
 Start-Sleep -Seconds 3
-$url = "http://192.168.0.108:3000"
+$url = "http://192.168.0.109:3000"
 Start-Process $url
