@@ -1,5 +1,8 @@
 # Script para construir e iniciar el frontend y backend en modo producción
 
+# Cargar configuración centralizada
+. "$PSScriptRoot\config.ps1"
+
 Write-Host "Construyendo Frontend..."
 Set-Location -Path "front"
 npm run build
@@ -28,6 +31,6 @@ Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd backend; npm r
 
 Write-Host "Ambos servidores están iniciándose en nuevas ventanas de PowerShell."
 
-Write-Host "Abriendo navegador en http://localhost:3000/ ..."
+Write-Host "Abriendo navegador en $FRONTEND_URL ..."
 Start-Sleep -Seconds 5
-Start-Process "http://localhost:3000/"
+Start-Process "$FRONTEND_URL"
