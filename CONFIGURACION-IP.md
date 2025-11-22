@@ -6,7 +6,7 @@ Para cambiar la IP donde se ejecuta el programa, edita el archivo **`config.ps1`
 
 ```powershell
 # Cambia esta línea con tu IP local
-$SERVIDOR_IP = "192.168.0.109"  # <-- EDITA AQUÍ
+$SERVIDOR_IP = "172.20.10.4"  # <-- EDITA AQUÍ
 ```
 
 ### Opción 1: Actualización Manual
